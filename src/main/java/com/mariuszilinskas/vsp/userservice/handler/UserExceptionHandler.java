@@ -60,6 +60,11 @@ public class UserExceptionHandler {
         return buildErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(UserRegistrationException.class)
+    public ResponseEntity<ErrorResponse> handleUserRegistrationException(UserRegistrationException ex) {
+        return buildErrorResponse(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     // -----------------------------------------------------------
 
     /**
