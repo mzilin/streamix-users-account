@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * This class is a global exception handler that handles exceptions thrown across the whole application.
+ * This class is a global exception handler that handles exceptions thrown across the user service.
  *
  * @author Marius Zilinskas
  */
@@ -57,31 +57,6 @@ public class UserExceptionHandler {
 
     @ExceptionHandler(EmailExistsException.class)
     public ResponseEntity<ErrorResponse> handleUserExistsException(EmailExistsException ex) {
-        return buildErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(PasswordValidationException.class)
-    public ResponseEntity<ErrorResponse> handlePasswordValidationException(PasswordValidationException ex) {
-        return buildErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(PinCodeDoesntMatchException.class)
-    public ResponseEntity<ErrorResponse> handlePinCodeDoesntMatchException(PinCodeDoesntMatchException ex) {
-        return buildErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(PinCodeExpiredException.class)
-    public ResponseEntity<ErrorResponse> handlePinCodeExpiredException(PinCodeExpiredException ex) {
-        return buildErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(ResetTokenValidationException.class)
-    public ResponseEntity<ErrorResponse> handleResetTokenValidationException(ResetTokenValidationException ex) {
-        return buildErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(UserAlreadyVerifiedException.class)
-    public ResponseEntity<ErrorResponse> handleUserAlreadyVerifiedException(UserAlreadyVerifiedException ex) {
         return buildErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
