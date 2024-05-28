@@ -1,6 +1,5 @@
 package com.mariuszilinskas.vsp.userservice.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mariuszilinskas.vsp.userservice.enums.UserRole;
 import com.mariuszilinskas.vsp.userservice.enums.UserStatus;
 import jakarta.persistence.*;
@@ -36,10 +35,6 @@ public class User {
 
     @Column(nullable = false, unique = true)
     private String email;
-
-    @JsonIgnore
-    @Column(name = "password_hash", nullable = false)
-    private String passwordHash;
 
     @Column(name = "is_email_verified", nullable = false)
     private boolean isEmailVerified = false;
