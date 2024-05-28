@@ -28,9 +28,9 @@ public record CreateUserRequest(
         String password
 ) {
         public CreateUserRequest {
-                firstName = firstName.trim();
-                lastName = lastName.trim();
-                email = email.trim().toLowerCase();
-                password = password.trim();
+                if (firstName != null) firstName = firstName.trim();
+                if (lastName != null) lastName = lastName.trim();
+                if (email != null) email = email.trim().toLowerCase();
+                if (password != null) password = password.trim();
         }
 }
