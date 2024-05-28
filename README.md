@@ -3,7 +3,7 @@
 
 ## Introduction
 
-The `User Service` is an integral component of the `Video Streaming Platform`, responsible for user creation, validation, updates, deletion and password hashing.
+The `User Service` is an integral component of the `Video Streaming Platform`, responsible for user creation, validation, updates and deletion.
 
 Built with Spring Boot, this microservice uses PostgreSQL as its database, providing a robust and scalable solution for data storage and manipulation.
 
@@ -13,23 +13,20 @@ This microservice utilises a comprehensive suite of technologies and dependencie
 
 - **Spring Boot** `3.2.5`:
     - **Actuator**: Monitors and manages the app.
-    - **Web**: Supports web-based applications.
     - **Data JPA**: Provides Java Persistence API for database integration.
+    - **Web**: Supports web-based applications.
 
 - **Spring Cloud** `2023.0.1`:
     - **Config**: Manages externalised configuration.
     - **Netflix Eureka Client**: Allows this microservice to register with a Eureka server.
+    - **OpenFeign Client**: Enables easy creation of declarative REST clients that integrate with service discovery.
 
 - **Java** `JDK 17`: Essential for secure, portable, high-performance software development.
-
-- **Spring Security** `6.1.0`:
-    - **(Crypto)**: Provides encryption and decryption functionalities.
 
 - **Lombok**: Simplifies the codebase by reducing boilerplate.
 
 - **Database Integration**:
     - **Flyway**: Manages database migrations.
-    - **H2 Database**: Provides an in-memory database for development.
     - **PostgreSQL**: Used for production databases.
 
 - **Testing**:
