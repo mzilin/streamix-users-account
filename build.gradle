@@ -44,6 +44,7 @@ dependencies {
 
     // Other dependencies
     implementation 'org.jetbrains:annotations:24.0.1'
+    implementation 'io.github.openfeign:feign-jackson'
 
     // Lombok
     compileOnly 'org.projectlombok:lombok'
