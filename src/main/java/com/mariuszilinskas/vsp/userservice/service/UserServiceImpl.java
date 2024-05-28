@@ -3,10 +3,12 @@ package com.mariuszilinskas.vsp.userservice.service;
 import com.mariuszilinskas.vsp.userservice.client.AuthFeignClient;
 import com.mariuszilinskas.vsp.userservice.dto.CreateCredentialsRequest;
 import com.mariuszilinskas.vsp.userservice.dto.CreateUserRequest;
+import com.mariuszilinskas.vsp.userservice.dto.UserIdRequest;
 import com.mariuszilinskas.vsp.userservice.dto.UserResponse;
 import com.mariuszilinskas.vsp.userservice.enums.UserRole;
 import com.mariuszilinskas.vsp.userservice.enums.UserStatus;
 import com.mariuszilinskas.vsp.userservice.exception.EmailExistsException;
+import com.mariuszilinskas.vsp.userservice.exception.ResourceNotFoundException;
 import com.mariuszilinskas.vsp.userservice.exception.UserRegistrationException;
 import com.mariuszilinskas.vsp.userservice.model.User;
 import com.mariuszilinskas.vsp.userservice.repository.UserRepository;
@@ -71,10 +73,27 @@ public class UserServiceImpl implements UserService {
             );
             authFeignClient.createPasswordAndSetPasscode(credentialsRequest);
         } catch (FeignException ex) {
-            logger.error("Failed to create password and passcode: {}", ex.getMessage());
+            logger.error("Failed to create Password and Passcode for User [id: {}]: Status {}, Body {}",
+                    userId, ex.status(), ex.contentUTF8());
             userRepository.deleteById(userId);  // Rollback user creation
             throw new UserRegistrationException(userId);
         }
+    }
+
+    @Override
+    public UserResponse getUser(UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException(User.class, "id", userId));
+        return toUserResponse(user);
+    }
+
+    @Override
+    @Transactional
+    public void verifyUserEmail(UUID userId) {
+        logger.info("Verifying User [id: '{}'", userId);
+        User user = findUserById(userId);
+        user.setEmailVerified(true);
+        userRepository.save(user);
     }
 
     private UserResponse toUserResponse(User user) {
@@ -93,8 +112,28 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
-    public void updateUserStatus(UUID userId, UserStatus newStatus) {
-        //
+    public UUID getUserIdByEmail(UserIdRequest request) {
+        logger.info("Getting User ID [email: '{}'", request.email());
+        User user = findUserByEmail(request.email());
+        return user.getId();
     }
+
+    private User findUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException(User.class, "email", email));
+    }
+
+
+    @Override
+    public UserRole getUserRole(UUID userId) {
+        logger.info("Getting User Role for User [userId: '{}'", userId);
+        User user = findUserById(userId);
+        return user.getRole();
+    }
+
+    private User findUserById(UUID userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException(User.class, "id", userId));
+    }
+
 }
