@@ -1,6 +1,6 @@
 # Server properties
 server:
-  port: 8091
+  port: 8092
 
 # Information for the info endpoint
 info:
@@ -40,25 +40,17 @@ eureka:
     preferIpAddress: true
 
 # Management properties
-endpoints:
-  shutdown:
-    enabled: true
 management:
   info:
     env:
       enabled: true
-  endpoint:
-    shutdown:
-      enabled: true
   endpoints:
     web:
       exposure:
-        include: info, health, refresh, shutdown
+        include: info, health, refresh
 
-# Logging properties
 logging:
   level:
-    root: ERROR
-    com.proactivetechie: INFO
-    org.springframework: INFO
-    org.hibernate: INFO
+    root: INFO
+    org.springframework.web: DEBUG
+    org.springframework.security: DEBUG
