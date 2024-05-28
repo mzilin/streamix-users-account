@@ -4,10 +4,12 @@ package com.mariuszilinskas.vsp.userservice.handler;
 import com.mariuszilinskas.vsp.userservice.dto.ErrorResponse;
 import com.mariuszilinskas.vsp.userservice.dto.FieldErrorResponse;
 import com.mariuszilinskas.vsp.userservice.exception.*;
+import com.mariuszilinskas.vsp.userservice.util.UserUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -25,9 +27,8 @@ public class UserExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(UserExceptionHandler.class);
 
-    /**
-     * Exception for Request Validations
-     */
+    // ----------------- Request Validations ----------------------
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<FieldErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
@@ -39,6 +40,12 @@ public class UserExceptionHandler {
         HttpStatus status = HttpStatus.BAD_REQUEST;
         FieldErrorResponse errorResponse = new FieldErrorResponse(errors, status.value(), status.getReasonPhrase());
         return new ResponseEntity<>(errorResponse, status);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+        String formattedMessage = ex.getMessage().replace(UserUtils.BASE_PACKAGE_NAME, "");
+        return buildErrorResponse(formattedMessage, HttpStatus.BAD_REQUEST);
     }
 
     // --------------------- General ------------------------------
