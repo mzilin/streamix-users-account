@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @FeignClient("auth")
 public interface AuthFeignClient {
 
-    @PostMapping(value = "createPasswordAndSetPasscode", consumes = "application/json")
+    @PostMapping(value = "/credentials", consumes = "application/json")
     ResponseEntity<Void> createPasswordAndSetPasscode(@RequestBody CreateCredentialsRequest request);
 
 }
