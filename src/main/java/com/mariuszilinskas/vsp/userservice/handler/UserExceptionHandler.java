@@ -42,12 +42,6 @@ public class UserExceptionHandler {
         return new ResponseEntity<>(errorResponse, status);
     }
 
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
-        String formattedMessage = ex.getMessage().replace(UserUtils.BASE_PACKAGE_NAME, "");
-        return buildErrorResponse(formattedMessage, HttpStatus.BAD_REQUEST);
-    }
-
     // --------------------- General ------------------------------
 
     @ExceptionHandler(ResourceNotFoundException.class)
