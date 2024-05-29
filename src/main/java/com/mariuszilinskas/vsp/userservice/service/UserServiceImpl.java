@@ -1,10 +1,7 @@
 package com.mariuszilinskas.vsp.userservice.service;
 
 import com.mariuszilinskas.vsp.userservice.client.AuthFeignClient;
-import com.mariuszilinskas.vsp.userservice.dto.CreateCredentialsRequest;
-import com.mariuszilinskas.vsp.userservice.dto.CreateUserRequest;
-import com.mariuszilinskas.vsp.userservice.dto.UserIdRequest;
-import com.mariuszilinskas.vsp.userservice.dto.UserResponse;
+import com.mariuszilinskas.vsp.userservice.dto.*;
 import com.mariuszilinskas.vsp.userservice.enums.UserRole;
 import com.mariuszilinskas.vsp.userservice.enums.UserStatus;
 import com.mariuszilinskas.vsp.userservice.exception.EmailExistsException;
@@ -82,9 +79,23 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse getUser(UUID userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException(User.class, "id", userId));
+        logger.info("Getting User [id: '{}'", userId);
+        User user = findUserById(userId);
         return toUserResponse(user);
+    }
+
+    @Override
+    public UserResponse updateUser(UUID userId, UpdateUserRequest request) {
+        logger.info("Updating User [id: '{}'", userId);
+        User user = findUserById(userId);
+        updateUserDataFromRequest(user, request);
+        return toUserResponse(user);
+    }
+
+    private void updateUserDataFromRequest(User user, UpdateUserRequest request) {
+        user.setFirstName(request.firstName());
+        user.setLastName(request.lastName());
+        userRepository.save(user);
     }
 
     @Override
@@ -122,7 +133,6 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException(User.class, "email", email));
     }
-
 
     @Override
     public UserRole getUserRole(UUID userId) {

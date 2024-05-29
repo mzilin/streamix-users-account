@@ -1,6 +1,7 @@
 package com.mariuszilinskas.vsp.userservice.service;
 
 import com.mariuszilinskas.vsp.userservice.dto.CreateUserRequest;
+import com.mariuszilinskas.vsp.userservice.dto.UpdateUserRequest;
 import com.mariuszilinskas.vsp.userservice.dto.UserIdRequest;
 import com.mariuszilinskas.vsp.userservice.dto.UserResponse;
 import com.mariuszilinskas.vsp.userservice.enums.UserRole;
@@ -12,6 +13,8 @@ public interface UserService {
     UserResponse createUser(CreateUserRequest request);
 
     UserResponse getUser(UUID userId);
+
+    UserResponse updateUser(UUID userId, UpdateUserRequest request);
 
     void verifyUserEmail(UUID userId);
 
