@@ -93,11 +93,11 @@ public class UserController {
         return new ResponseEntity<>(userRole, HttpStatus.OK);
     }
 
-    @GetMapping("/id-by-email")
+    @GetMapping("/data/id-by-email")
     public ResponseEntity<UUID> getUserIdByEmail(
-            @Valid @RequestBody UserIdRequest request
+            @Valid @RequestParam String email
     ){
-        UUID userId = userService.getUserIdByEmail(request);
+        UUID userId = userService.getUserIdByEmail(email);
         return new ResponseEntity<>(userId, HttpStatus.OK);
     }
 
