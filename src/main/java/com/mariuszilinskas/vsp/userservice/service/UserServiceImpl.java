@@ -62,8 +62,8 @@ public class UserServiceImpl implements UserService {
 
     private void createUserCredentials(UUID userId, String password) {
         try {
-            CreateCredentialsRequest credentialsRequest = new CreateCredentialsRequest(userId, password);
-            authFeignClient.createPasswordAndSetPasscode(credentialsRequest);
+            CredentialsRequest request = new CredentialsRequest(userId, password);
+            authFeignClient.createPasswordAndSetPasscode(request);
         } catch (FeignException ex) {
             logger.error("Failed to create Password and Passcode for User [id: {}]: Status {}, Body {}",
                     userId, ex.status(), ex.contentUTF8());
@@ -109,8 +109,8 @@ public class UserServiceImpl implements UserService {
 
     private void verifyPassword(UUID userId, String password) {
         try {
-            CreateCredentialsRequest credentialsRequest = new CreateCredentialsRequest(userId, password);
-            authFeignClient.verifyPassword(credentialsRequest);
+            CredentialsRequest request = new CredentialsRequest(userId, password);
+            authFeignClient.verifyPassword(request);
         } catch (FeignException ex) {
             throw new PasswordValidationException();
         }
