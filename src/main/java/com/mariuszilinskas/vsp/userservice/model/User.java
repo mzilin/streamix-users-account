@@ -36,6 +36,9 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
+    @Column(nullable = false)
+    private String country;
+
     @Column(name = "is_email_verified", nullable = false)
     private boolean isEmailVerified = false;
 

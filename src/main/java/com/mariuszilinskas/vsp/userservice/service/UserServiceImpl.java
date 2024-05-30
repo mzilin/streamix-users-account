@@ -52,6 +52,7 @@ public class UserServiceImpl implements UserService {
         user.setFirstName(request.firstName());
         user.setLastName(request.lastName());
         user.setEmail(request.email());
+        user.setCountry(request.country());
         user.setRole(UserRole.USER);
         user.setStatus(UserStatus.PENDING);
 
@@ -65,7 +66,7 @@ public class UserServiceImpl implements UserService {
             CredentialsRequest request = new CredentialsRequest(userId, password);
             authFeignClient.createPasswordAndSetPasscode(request);
         } catch (FeignException ex) {
-            logger.error("Failed to create Password and Passcode for User [id: {}]: Status {}, Body {}",
+            logger.error("Feign Exception when creating Password and Passcode for User [id: {}]: Status {}, Body {}",
                     userId, ex.status(), ex.contentUTF8());
             userRepository.deleteById(userId);  // Rollback user creation
             throw new UserRegistrationException(userId);
@@ -99,6 +100,7 @@ public class UserServiceImpl implements UserService {
                 user.getFirstName(),
                 user.getLastName(),
                 user.getEmail(),
+                user.getCountry(),
                 user.isEmailVerified(),
                 user.getStatus().name(),
                 user.getRole().name(),
@@ -127,6 +129,7 @@ public class UserServiceImpl implements UserService {
             CredentialsRequest request = new CredentialsRequest(userId, password);
             authFeignClient.verifyPassword(request);
         } catch (FeignException ex) {
+            logger.error("Feign Exception when verifying password: Status {}, Body {}", ex.status(), ex.contentUTF8());
             throw new PasswordValidationException();
         }
     }
@@ -156,9 +159,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UUID getUserIdByEmail(UserIdRequest request) {
-        logger.info("Getting User ID [email: '{}'", request.email());
-        User user = findUserByEmail(request.email());
+    public UUID getUserIdByEmail(String email) {
+        logger.info("Getting User ID [email: '{}'", email);
+        User user = findUserByEmail(email);
         return user.getId();
     }
 
@@ -179,4 +182,8 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new ResourceNotFoundException(User.class, "id", userId));
     }
 
+    @Override
+    public void deleteUser(UUID userId, DeleteUserRequest request) {
+        // TODO: RabbitMQ to all services for user data deletion
+    }
 }

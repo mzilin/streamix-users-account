@@ -17,8 +17,10 @@ public interface UserService {
 
     void verifyUser(UUID userId);
 
-    UUID getUserIdByEmail(UserIdRequest request);
+    UUID getUserIdByEmail(String email);
 
     UserRole getUserRole(UUID userId);
+
+    void deleteUser(UUID userId, DeleteUserRequest request);
 
 }

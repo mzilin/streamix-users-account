@@ -16,6 +16,10 @@ public record CreateUserRequest(
         @Email(message = "email should be valid")
         String email,
 
+        @NotBlank(message = "country cannot be blank")
+        @Email(message = "country should be valid")
+        String country,
+
         @NotBlank(message = "password cannot be blank")
         @Size(min = 8, max = 64, message = "password must be between 8 and 64 characters")
         @Pattern.List({

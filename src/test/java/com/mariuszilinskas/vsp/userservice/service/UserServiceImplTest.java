@@ -54,6 +54,7 @@ public class UserServiceImplTest {
         user.setFirstName("John");
         user.setLastName("Doe");
         user.setEmail("john@example.com");
+        user.setCountry("United Kingdom");
         user.setStatus(UserStatus.ACTIVE);
         user.setRole(UserRole.USER);
 
@@ -61,6 +62,7 @@ public class UserServiceImplTest {
         user2.setFirstName("Jane");
         user2.setLastName("Doe");
         user2.setEmail("jane@example.com");
+        user2.setCountry("United Kingdom");
         user.setStatus(UserStatus.ACTIVE);
         user.setRole(UserRole.USER);
 
@@ -68,6 +70,7 @@ public class UserServiceImplTest {
                 user.getFirstName(),
                 user.getLastName(),
                 user.getEmail(),
+                user.getCountry(),
                 "Password123!"
         );
 
@@ -113,6 +116,7 @@ public class UserServiceImplTest {
         assertEquals(createUserRequest.firstName(), savedUser.getFirstName());
         assertEquals(createUserRequest.lastName(), savedUser.getLastName());
         assertEquals(createUserRequest.email(), savedUser.getEmail());
+        assertEquals(createUserRequest.country(), savedUser.getCountry());
         assertFalse(savedUser.isEmailVerified());
     }
 
@@ -368,12 +372,10 @@ public class UserServiceImplTest {
     @Test
     void tesGetUserIdByEmail_Success() {
         // Arrange
-        UserIdRequest request = new UserIdRequest(user.getEmail());
-
         when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
 
         // Act
-        UUID id = userService.getUserIdByEmail(request);
+        UUID id = userService.getUserIdByEmail(user.getEmail());
 
         // Assert
         assertNotNull(id);
@@ -386,12 +388,10 @@ public class UserServiceImplTest {
     void testGetUserIdByEmail_NonExistentUser() {
         // Arrange
         String nonExistentUserEmail = "some@email.com";
-        UserIdRequest request = new UserIdRequest(nonExistentUserEmail);
-
         when(userRepository.findByEmail(nonExistentUserEmail)).thenReturn(Optional.empty());
 
         // Assert & Act
-        assertThrows(ResourceNotFoundException.class, () -> userService.getUserIdByEmail(request));
+        assertThrows(ResourceNotFoundException.class, () -> userService.getUserIdByEmail(nonExistentUserEmail));
 
         // Assert
         verify(userRepository, times(1)).findByEmail(nonExistentUserEmail);
