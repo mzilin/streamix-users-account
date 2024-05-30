@@ -104,7 +104,7 @@ public class UserServiceImpl implements UserService {
 
         // TODO: RabbitMQ - send request to create passcode and send verification email
 
-        return new UpdateEmailResponse(userId, user.getEmail());
+        return new UpdateEmailResponse(userId, user.getEmail(), user.isEmailVerified());
     }
 
     private void verifyPassword(UUID userId, String password) {

@@ -4,5 +4,6 @@ import java.util.UUID;
 
 public record UpdateEmailResponse(
         UUID userId,
-        String email
+        String email,
+        boolean isEmailVerified
 ) {}

@@ -1,13 +1,11 @@
 package com.mariuszilinskas.vsp.userservice.service;
 
 import com.mariuszilinskas.vsp.userservice.client.AuthFeignClient;
-import com.mariuszilinskas.vsp.userservice.dto.CredentialsRequest;
-import com.mariuszilinskas.vsp.userservice.dto.CreateUserRequest;
-import com.mariuszilinskas.vsp.userservice.dto.UpdateUserRequest;
-import com.mariuszilinskas.vsp.userservice.dto.UserResponse;
+import com.mariuszilinskas.vsp.userservice.dto.*;
 import com.mariuszilinskas.vsp.userservice.enums.UserRole;
 import com.mariuszilinskas.vsp.userservice.enums.UserStatus;
 import com.mariuszilinskas.vsp.userservice.exception.EmailExistsException;
+import com.mariuszilinskas.vsp.userservice.exception.PasswordValidationException;
 import com.mariuszilinskas.vsp.userservice.exception.ResourceNotFoundException;
 import com.mariuszilinskas.vsp.userservice.exception.UserRegistrationException;
 import com.mariuszilinskas.vsp.userservice.model.User;
@@ -145,7 +143,7 @@ public class UserServiceImplTest {
         doThrow(feignException).when(authFeignClient).createPasswordAndSetPasscode(any(CredentialsRequest.class));
         doNothing().when(userRepository).deleteById(userId);
 
-        //Act & Assert
+        // Act & Assert
         assertThrows(UserRegistrationException.class, () -> userService.createUser(createUserRequest));
 
         // Assert
@@ -233,7 +231,102 @@ public class UserServiceImplTest {
 
     // ------------------------------------
 
-    // TODO: updateUserEmail
+    @Test
+    void testUpdateUserEmail_Success() {
+        // Arrange
+        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+
+        String password = "Password1!";
+        String currentEmail = "current_email@example.com";
+        String newEmail = "new_email@example.com";
+
+        user.setEmail(currentEmail);
+
+        UpdateEmailRequest request = new UpdateEmailRequest(newEmail, password);
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(authFeignClient.verifyPassword(any(CredentialsRequest.class))).thenReturn(null);
+        when(userRepository.existsByEmail(request.email())).thenReturn(false);
+        when(userRepository.save(captor.capture())).thenReturn(user);
+
+        // Act
+        UpdateEmailResponse response = userService.updateUserEmail(userId, request);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(user.getId(), response.userId());
+        assertEquals(newEmail, response.email());
+        assertFalse(response.isEmailVerified());
+
+        verify(userRepository, times(1)).findById(userId);
+        verify(authFeignClient, times(1)).verifyPassword(any(CredentialsRequest.class));
+        verify(userRepository, times(1)).existsByEmail(request.email());
+        verify(userRepository, times(1)).save(captor.capture());
+
+        User savedUser = captor.getValue();
+        assertEquals(newEmail, savedUser.getEmail());
+    }
+
+    @Test
+    void testUpdateUserEmail_PasswordsDontMatch() {
+        // Arrange
+        String password = "wrongPassword";
+        String currentEmail = "previous_email@example.com";
+        String newEmail = "new_email@example.com";
+
+        user.setEmail(currentEmail);
+
+        UpdateEmailRequest request = new UpdateEmailRequest(newEmail, password);
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        doThrow(feignException).when(authFeignClient).verifyPassword(any(CredentialsRequest.class));
+
+        // Act & Assert
+        assertThrows(PasswordValidationException.class, () -> userService.updateUserEmail(userId, request));
+
+        // Assert
+        verify(userRepository, times(1)).findById(userId);
+        verify(authFeignClient, times(1)).verifyPassword(any(CredentialsRequest.class));
+        verify(userRepository, never()).existsByEmail(request.email());
+        verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    void testUpdateUserEmail_NonExistentUser() {
+        // Arrange
+        UUID nonExistentId = UUID.randomUUID();
+        UpdateEmailRequest request = new UpdateEmailRequest("updated_email@example.com", "currentPassword");
+
+        when(userRepository.findById(nonExistentId)).thenReturn(Optional.empty());
+
+        // Assert & Act
+        assertThrows(ResourceNotFoundException.class, () -> userService.updateUserEmail(nonExistentId, request));
+
+        // Assert
+        verify(userRepository, times(1)).findById(nonExistentId);
+        verify(authFeignClient, never()).verifyPassword(any(CredentialsRequest.class));
+        verify(userRepository, never()).existsByEmail(request.email());
+        verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    void testUpdateUserEmail_NewEmailAlreadyInUse() {
+        // Arrange
+        UpdateEmailRequest request = new UpdateEmailRequest("email_in_use@example.com", "currentPassword");
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(authFeignClient.verifyPassword(any(CredentialsRequest.class))).thenReturn(null);
+        when(userRepository.existsByEmail(request.email())).thenReturn(true);
+
+        // Assert & Act
+        assertThrows(EmailExistsException.class, () -> userService.updateUserEmail(userId, request));
+
+        // Assert
+        verify(userRepository, times(1)).findById(userId);
+        verify(authFeignClient, times(1)).verifyPassword(any(CredentialsRequest.class));
+        verify(userRepository, times(1)).existsByEmail(request.email());
+        verify(userRepository, never()).save(any(User.class));
+    }
 
     // ------------------------------------
 
