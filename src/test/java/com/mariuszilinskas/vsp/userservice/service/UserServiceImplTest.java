@@ -365,11 +365,56 @@ public class UserServiceImplTest {
 
     // ------------------------------------
 
-    // TODO: getUserIdByEmail
+    @Test
+    void tesGetUserIdByEmail_Success() {
+        // Arrange
+        UserIdRequest request = new UserIdRequest(user.getEmail());
+
+        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
+
+        // Act
+        UUID id = userService.getUserIdByEmail(request);
+
+        // Assert
+        assertNotNull(id);
+        assertEquals(userId, id);
+        verify(userRepository, times(1)).findByEmail(user.getEmail());
+    }
+
+    @Test
+    void testGetUserIdByEmail_NonExistentUser() {
+        // Arrange
+        String nonExistentUserEmail = "some@email.com";
+        UserIdRequest request = new UserIdRequest(nonExistentUserEmail);
+
+        when(userRepository.findByEmail(nonExistentUserEmail)).thenReturn(Optional.empty());
+
+        // Assert & Act
+        assertThrows(ResourceNotFoundException.class, () -> userService.getUserIdByEmail(request));
+
+        // Assert
+        verify(userRepository, times(1)).findByEmail(nonExistentUserEmail);
+    }
 
     // ------------------------------------
 
-    // TODO: getUserRole
+    @Test
+    void testGetUserRole_Success() {
+
+    }
+
+    @Test
+    void testGetUserRole_NonExistentUser() {
+        // Arrange
+        UUID nonExistentId = UUID.randomUUID();
+        when(userRepository.findById(nonExistentId)).thenReturn(Optional.empty());
+
+        // Assert & Act
+        assertThrows(ResourceNotFoundException.class, () -> userService.getUserRole(nonExistentId));
+
+        // Assert
+        verify(userRepository, times(1)).findById(nonExistentId);
+    }
 
     // ------------------------------------
 
