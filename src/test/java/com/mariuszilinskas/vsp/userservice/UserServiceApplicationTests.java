@@ -1,6 +1,7 @@
 package com.mariuszilinskas.vsp.userservice;
 
 import com.mariuszilinskas.vsp.userservice.client.AuthFeignClient;
+import com.mariuszilinskas.vsp.userservice.controller.UserController;
 import com.mariuszilinskas.vsp.userservice.repository.UserRepository;
 import com.mariuszilinskas.vsp.userservice.service.UserService;
 import org.junit.jupiter.api.Test;
@@ -22,6 +23,9 @@ class UserServiceApplicationTests {
     private UserRepository userRepository;
 
     @Autowired
+    private UserController userController;
+
+    @Autowired
     private AuthFeignClient authFeignClient;
 
     @Test
@@ -36,6 +40,11 @@ class UserServiceApplicationTests {
     @Test
     void userRepositoryBeanLoads() {
         assertNotNull(userRepository, "User Repository should have been auto-wired by Spring Context");
+    }
+
+    @Test
+    void userControllerBeanLoads() {
+        assertNotNull(userController, "User Controller should have been auto-wired by Spring Context");
     }
 
     @Test
