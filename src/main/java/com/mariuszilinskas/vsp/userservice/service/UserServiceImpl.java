@@ -5,6 +5,7 @@ import com.mariuszilinskas.vsp.userservice.dto.*;
 import com.mariuszilinskas.vsp.userservice.enums.UserRole;
 import com.mariuszilinskas.vsp.userservice.enums.UserStatus;
 import com.mariuszilinskas.vsp.userservice.exception.EmailExistsException;
+import com.mariuszilinskas.vsp.userservice.exception.PasswordValidationException;
 import com.mariuszilinskas.vsp.userservice.exception.ResourceNotFoundException;
 import com.mariuszilinskas.vsp.userservice.exception.UserRegistrationException;
 import com.mariuszilinskas.vsp.userservice.model.User;
@@ -41,14 +42,9 @@ public class UserServiceImpl implements UserService {
         checkEmailExists(request.email());
         User newUser = populateNewUserWithRequestData(request);
         User createdUser = userRepository.save(newUser);
-        createUserCredentials(createdUser.getId(), request);
+        createUserCredentials(createdUser.getId(), request.password());
 
         return toUserResponse(createdUser);
-    }
-
-    private void checkEmailExists(String email) {
-        if (userRepository.existsByEmail(email))
-            throw new EmailExistsException();
     }
 
     private User populateNewUserWithRequestData(CreateUserRequest request) {
@@ -58,16 +54,15 @@ public class UserServiceImpl implements UserService {
         user.setEmail(request.email());
         user.setRole(UserRole.USER);
         user.setStatus(UserStatus.PENDING);
+
+        // TODO: create default profiles & avatars
+
         return user;
     }
 
-    private void createUserCredentials(UUID userId, CreateUserRequest request) {
+    private void createUserCredentials(UUID userId, String password) {
         try {
-            CreateCredentialsRequest credentialsRequest = new CreateCredentialsRequest(
-                    userId,
-                    request.email(),
-                    request.password()
-            );
+            CreateCredentialsRequest credentialsRequest = new CreateCredentialsRequest(userId, password);
             authFeignClient.createPasswordAndSetPasscode(credentialsRequest);
         } catch (FeignException ex) {
             logger.error("Failed to create Password and Passcode for User [id: {}]: Status {}, Body {}",
@@ -86,15 +81,49 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse updateUser(UUID userId, UpdateUserRequest request) {
-        logger.info("Updating User [id: '{}'", userId);
+        logger.info("Updating User [id: '{}']", userId);
         User user = findUserById(userId);
-        updateUserDataFromRequest(user, request);
+        applyUserUpdates(user, request);
         return toUserResponse(user);
     }
 
-    private void updateUserDataFromRequest(User user, UpdateUserRequest request) {
+    private void applyUserUpdates(User user, UpdateUserRequest request) {
         user.setFirstName(request.firstName());
         user.setLastName(request.lastName());
+        userRepository.save(user);
+    }
+
+    @Override
+    public UpdateUserEmailResponse updateUserEmail(UUID userId, UpdateUserEmailRequest request) {
+        logger.info("Updating User Email [id: '{}'", userId);
+
+        User user = findUserById(userId);
+        verifyPassword(userId, request.password());
+        checkEmailExists(request.email());
+        applyEmailUpdate(user, request);
+
+        // TODO: RabbitMQ - send request to create passcode and send verification email
+
+        return new UpdateUserEmailResponse(userId, user.getEmail());
+    }
+
+    private void verifyPassword(UUID userId, String password) {
+        try {
+            CreateCredentialsRequest credentialsRequest = new CreateCredentialsRequest(userId, password);
+            authFeignClient.verifyPassword(credentialsRequest);
+        } catch (FeignException ex) {
+            throw new PasswordValidationException();
+        }
+    }
+
+    private void checkEmailExists(String email) {
+        if (userRepository.existsByEmail(email))
+            throw new EmailExistsException();
+    }
+
+    private void applyEmailUpdate(User user, UpdateUserEmailRequest request) {
+        user.setEmail(request.email());
+        user.setEmailVerified(false);
         userRepository.save(user);
     }
 

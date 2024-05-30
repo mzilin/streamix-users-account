@@ -1,9 +1,6 @@
 package com.mariuszilinskas.vsp.userservice.controller;
 
-import com.mariuszilinskas.vsp.userservice.dto.CreateUserRequest;
-import com.mariuszilinskas.vsp.userservice.dto.UpdateUserRequest;
-import com.mariuszilinskas.vsp.userservice.dto.UserIdRequest;
-import com.mariuszilinskas.vsp.userservice.dto.UserResponse;
+import com.mariuszilinskas.vsp.userservice.dto.*;
 import com.mariuszilinskas.vsp.userservice.enums.UserRole;
 import com.mariuszilinskas.vsp.userservice.service.UserService;
 import jakarta.validation.Valid;
@@ -50,6 +47,33 @@ public class UserController {
         UserResponse response = userService.updateUser(userId, request);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @PutMapping("/{userId}/email")
+    public ResponseEntity<UpdateUserEmailResponse> updateUserEmail(
+            @PathVariable UUID userId,
+            @Valid @RequestBody UpdateUserEmailRequest request
+    ) {
+        UpdateUserEmailResponse response = userService.updateUserEmail(userId, request);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    // ------------------------------------------------------
+
+//    @PostMapping("/{userId}/address")
+//    public
+
+    // TODO: add address
+    // TODO: update address
+    // TODO: delete address
+
+    // TODO: add profile
+    // TODO: get user profiles???
+    // TODO: update profile
+    // TODO: delete profile
+
+    // TODO: create, get, update watchlist
+
+    // TODO: update, get viewing history
 
     // ------------------------------------------------------
 

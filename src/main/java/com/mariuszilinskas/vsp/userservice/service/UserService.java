@@ -1,9 +1,6 @@
 package com.mariuszilinskas.vsp.userservice.service;
 
-import com.mariuszilinskas.vsp.userservice.dto.CreateUserRequest;
-import com.mariuszilinskas.vsp.userservice.dto.UpdateUserRequest;
-import com.mariuszilinskas.vsp.userservice.dto.UserIdRequest;
-import com.mariuszilinskas.vsp.userservice.dto.UserResponse;
+import com.mariuszilinskas.vsp.userservice.dto.*;
 import com.mariuszilinskas.vsp.userservice.enums.UserRole;
 
 import java.util.UUID;
@@ -15,6 +12,8 @@ public interface UserService {
     UserResponse getUser(UUID userId);
 
     UserResponse updateUser(UUID userId, UpdateUserRequest request);
+
+    UpdateUserEmailResponse updateUserEmail(UUID userId, UpdateUserEmailRequest request);
 
     void verifyUserEmail(UUID userId);
 
