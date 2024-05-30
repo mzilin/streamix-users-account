@@ -378,6 +378,7 @@ public class UserServiceImplTest {
         // Assert
         assertNotNull(id);
         assertEquals(userId, id);
+
         verify(userRepository, times(1)).findByEmail(user.getEmail());
     }
 
@@ -400,7 +401,17 @@ public class UserServiceImplTest {
 
     @Test
     void testGetUserRole_Success() {
+        // Arrange
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
+        // Assert & Act
+        UserRole role = userService.getUserRole(userId);
+
+        // Assert
+        assertNotNull(role);
+        assertEquals(user.getRole(), role);
+
+        verify(userRepository, times(1)).findById(userId);
     }
 
     @Test
