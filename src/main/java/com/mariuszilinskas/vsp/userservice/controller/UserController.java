@@ -77,11 +77,11 @@ public class UserController {
 
     // ------------------------------------------------------
 
-    @PatchMapping("/{userId}/verify-email")
-    public ResponseEntity<Void> verifyUserEmail(
+    @PatchMapping("/{userId}/verify")
+    public ResponseEntity<Void> verifyUser(
             @PathVariable UUID userId
     ){
-        userService.verifyUserEmail(userId);
+        userService.verifyUser(userId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

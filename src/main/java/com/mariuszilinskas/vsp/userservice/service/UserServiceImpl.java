@@ -144,7 +144,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void verifyUserEmail(UUID userId) {
+    public void verifyUser(UUID userId) {
         logger.info("Verifying User [id: '{}'", userId);
         User user = findUserById(userId);
         markEmailAsVerified(user);

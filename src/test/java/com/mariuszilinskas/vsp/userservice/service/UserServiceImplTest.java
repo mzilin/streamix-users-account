@@ -339,7 +339,7 @@ public class UserServiceImplTest {
         when(userRepository.save(captor.capture())).thenReturn(user);
 
         // Act
-        userService.verifyUserEmail(userId);
+        userService.verifyUser(userId);
 
         // Assert
         verify(userRepository, times(1)).findById(userId);
@@ -356,7 +356,7 @@ public class UserServiceImplTest {
         when(userRepository.findById(nonExistentId)).thenReturn(Optional.empty());
 
         // Assert & Act
-        assertThrows(ResourceNotFoundException.class, () -> userService.verifyUserEmail(nonExistentId));
+        assertThrows(ResourceNotFoundException.class, () -> userService.verifyUser(nonExistentId));
 
         // Assert
         verify(userRepository, times(1)).findById(nonExistentId);

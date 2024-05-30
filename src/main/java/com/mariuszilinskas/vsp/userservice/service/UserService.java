@@ -15,7 +15,7 @@ public interface UserService {
 
     UpdateEmailResponse updateUserEmail(UUID userId, UpdateEmailRequest request);
 
-    void verifyUserEmail(UUID userId);
+    void verifyUser(UUID userId);
 
     UUID getUserIdByEmail(UserIdRequest request);
 
