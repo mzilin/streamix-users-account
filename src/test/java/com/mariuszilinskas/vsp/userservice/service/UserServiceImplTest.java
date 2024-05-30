@@ -3,6 +3,7 @@ package com.mariuszilinskas.vsp.userservice.service;
 import com.mariuszilinskas.vsp.userservice.client.AuthFeignClient;
 import com.mariuszilinskas.vsp.userservice.dto.CredentialsRequest;
 import com.mariuszilinskas.vsp.userservice.dto.CreateUserRequest;
+import com.mariuszilinskas.vsp.userservice.dto.UpdateUserRequest;
 import com.mariuszilinskas.vsp.userservice.dto.UserResponse;
 import com.mariuszilinskas.vsp.userservice.enums.UserRole;
 import com.mariuszilinskas.vsp.userservice.enums.UserStatus;
@@ -190,7 +191,45 @@ public class UserServiceImplTest {
 
     // ------------------------------------
 
-    // TODO: updateUser
+    @Test
+    void testUpdateUser_Success() {
+        // Arrange
+        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+        UpdateUserRequest request = new UpdateUserRequest("UpdatedFirstName", "UpdatedLastName");
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(userRepository.save(captor.capture())).thenReturn(user);
+
+        // Act
+        UserResponse response = userService.updateUser(userId, request);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(user.getId(), response.id());
+
+        verify(userRepository, times(1)).findById(userId);
+        verify(userRepository, times(1)).save(captor.capture());
+
+        User savedUser = captor.getValue();
+        assertEquals(request.firstName(), savedUser.getFirstName());
+        assertEquals(request.lastName(), savedUser.getLastName());
+    }
+
+    @Test
+    void testUpdateUser_NonExistentUser() {
+        // Arrange
+        UpdateUserRequest request = new UpdateUserRequest("UpdatedFirstName", "UpdatedLastName");
+
+        UUID nonExistentId = UUID.randomUUID();
+        when(userRepository.findById(nonExistentId)).thenReturn(Optional.empty());
+
+        // Assert & Act
+        assertThrows(ResourceNotFoundException.class, () -> userService.updateUser(nonExistentId, request));
+
+        // Assert
+        verify(userRepository, times(1)).findById(nonExistentId);
+        verify(userRepository, never()).save(any(User.class));
+    }
 
     // ------------------------------------
 
