@@ -4,12 +4,10 @@ package com.mariuszilinskas.vsp.userservice.handler;
 import com.mariuszilinskas.vsp.userservice.dto.ErrorResponse;
 import com.mariuszilinskas.vsp.userservice.dto.FieldErrorResponse;
 import com.mariuszilinskas.vsp.userservice.exception.*;
-import com.mariuszilinskas.vsp.userservice.util.UserUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -63,6 +61,11 @@ public class UserExceptionHandler {
 
     @ExceptionHandler(UserRegistrationException.class)
     public ResponseEntity<ErrorResponse> handleUserRegistrationException(UserRegistrationException ex) {
+        return buildErrorResponse(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(PasswordValidationException.class)
+    public ResponseEntity<ErrorResponse> handlePasswordCheckException(PasswordValidationException ex) {
         return buildErrorResponse(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
