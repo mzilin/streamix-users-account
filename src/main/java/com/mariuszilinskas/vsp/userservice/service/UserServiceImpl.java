@@ -55,7 +55,7 @@ public class UserServiceImpl implements UserService {
         user.setRole(UserRole.USER);
         user.setStatus(UserStatus.PENDING);
 
-        // TODO: create default profiles & avatars
+        // TODO: create default profiles & avatars + UPDATE TESTS
 
         return user;
     }
