@@ -330,7 +330,38 @@ public class UserServiceImplTest {
 
     // ------------------------------------
 
-    // TODO: verifyUserEmail
+    @Test
+    void testVerifyUserEmail_Success() {
+        // Arrange
+        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(userRepository.save(captor.capture())).thenReturn(user);
+
+        // Act
+        userService.verifyUserEmail(userId);
+
+        // Assert
+        verify(userRepository, times(1)).findById(userId);
+        verify(userRepository, times(1)).save(captor.capture());
+
+        User savedUser = captor.getValue();
+        assertTrue(savedUser.isEmailVerified());
+    }
+
+    @Test
+    void testVerifyUserEmail_NonExistentUser() {
+        // Arrange
+        UUID nonExistentId = UUID.randomUUID();
+        when(userRepository.findById(nonExistentId)).thenReturn(Optional.empty());
+
+        // Assert & Act
+        assertThrows(ResourceNotFoundException.class, () -> userService.verifyUserEmail(nonExistentId));
+
+        // Assert
+        verify(userRepository, times(1)).findById(nonExistentId);
+        verify(userRepository, never()).save(any(User.class));
+    }
 
     // ------------------------------------
 

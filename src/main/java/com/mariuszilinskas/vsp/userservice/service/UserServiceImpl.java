@@ -93,6 +93,21 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
+    private UserResponse toUserResponse(User user) {
+        return new UserResponse(
+                user.getId(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getEmail(),
+                user.isEmailVerified(),
+                user.getStatus().name(),
+                user.getRole().name(),
+                user.getUserProfiles(),
+                user.getCreatedAt(),
+                user.getLastActive()
+        );
+    }
+
     @Override
     public UpdateEmailResponse updateUserEmail(UUID userId, UpdateEmailRequest request) {
         logger.info("Updating User Email [id: '{}'", userId);
@@ -132,23 +147,12 @@ public class UserServiceImpl implements UserService {
     public void verifyUserEmail(UUID userId) {
         logger.info("Verifying User [id: '{}'", userId);
         User user = findUserById(userId);
-        user.setEmailVerified(true);
-        userRepository.save(user);
+        markEmailAsVerified(user);
     }
 
-    private UserResponse toUserResponse(User user) {
-        return new UserResponse(
-                user.getId(),
-                user.getFirstName(),
-                user.getLastName(),
-                user.getEmail(),
-                user.isEmailVerified(),
-                user.getStatus().name(),
-                user.getRole().name(),
-                user.getUserProfiles(),
-                user.getCreatedAt(),
-                user.getLastActive()
-        );
+    private void markEmailAsVerified(User user) {
+        user.setEmailVerified(true);
+        userRepository.save(user);
     }
 
     @Override
