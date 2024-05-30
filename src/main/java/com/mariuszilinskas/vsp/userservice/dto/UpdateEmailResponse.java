@@ -2,7 +2,7 @@ package com.mariuszilinskas.vsp.userservice.dto;
 
 import java.util.UUID;
 
-public record UpdateUserEmailResponse(
+public record UpdateEmailResponse(
         UUID userId,
         String email
 ) {}

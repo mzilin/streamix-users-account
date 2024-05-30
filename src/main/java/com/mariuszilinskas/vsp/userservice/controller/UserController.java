@@ -49,11 +49,11 @@ public class UserController {
     }
 
     @PutMapping("/{userId}/email")
-    public ResponseEntity<UpdateUserEmailResponse> updateUserEmail(
+    public ResponseEntity<UpdateEmailResponse> updateUserEmail(
             @PathVariable UUID userId,
-            @Valid @RequestBody UpdateUserEmailRequest request
+            @Valid @RequestBody UpdateEmailRequest request
     ) {
-        UpdateUserEmailResponse response = userService.updateUserEmail(userId, request);
+        UpdateEmailResponse response = userService.updateUserEmail(userId, request);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

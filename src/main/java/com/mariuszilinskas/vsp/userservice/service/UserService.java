@@ -13,7 +13,7 @@ public interface UserService {
 
     UserResponse updateUser(UUID userId, UpdateUserRequest request);
 
-    UpdateUserEmailResponse updateUserEmail(UUID userId, UpdateUserEmailRequest request);
+    UpdateEmailResponse updateUserEmail(UUID userId, UpdateEmailRequest request);
 
     void verifyUserEmail(UUID userId);
 

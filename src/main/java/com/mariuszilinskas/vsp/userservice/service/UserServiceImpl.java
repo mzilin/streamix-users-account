@@ -94,7 +94,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UpdateUserEmailResponse updateUserEmail(UUID userId, UpdateUserEmailRequest request) {
+    public UpdateEmailResponse updateUserEmail(UUID userId, UpdateEmailRequest request) {
         logger.info("Updating User Email [id: '{}'", userId);
 
         User user = findUserById(userId);
@@ -104,7 +104,7 @@ public class UserServiceImpl implements UserService {
 
         // TODO: RabbitMQ - send request to create passcode and send verification email
 
-        return new UpdateUserEmailResponse(userId, user.getEmail());
+        return new UpdateEmailResponse(userId, user.getEmail());
     }
 
     private void verifyPassword(UUID userId, String password) {
@@ -121,7 +121,7 @@ public class UserServiceImpl implements UserService {
             throw new EmailExistsException();
     }
 
-    private void applyEmailUpdate(User user, UpdateUserEmailRequest request) {
+    private void applyEmailUpdate(User user, UpdateEmailRequest request) {
         user.setEmail(request.email());
         user.setEmailVerified(false);
         userRepository.save(user);

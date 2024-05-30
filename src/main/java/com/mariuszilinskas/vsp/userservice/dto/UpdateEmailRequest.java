@@ -3,7 +3,7 @@ package com.mariuszilinskas.vsp.userservice.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
-public record UpdateUserEmailRequest(
+public record UpdateEmailRequest(
         @NotBlank(message = "email cannot be blank")
         @Email(message = "email should be valid")
         String email,
@@ -12,7 +12,7 @@ public record UpdateUserEmailRequest(
         String password
 
 ) {
-        public UpdateUserEmailRequest {
+        public UpdateEmailRequest {
                 if (email != null) email = email.trim().toLowerCase();
                 if (password != null) password = password.trim();
         }
