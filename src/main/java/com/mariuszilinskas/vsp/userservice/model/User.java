@@ -1,5 +1,8 @@
 package com.mariuszilinskas.vsp.userservice.model;
 
+import com.mariuszilinskas.vsp.userservice.converter.UserAuthorityConverter;
+import com.mariuszilinskas.vsp.userservice.converter.UserRoleConverter;
+import com.mariuszilinskas.vsp.userservice.enums.UserAuthority;
 import com.mariuszilinskas.vsp.userservice.enums.UserRole;
 import com.mariuszilinskas.vsp.userservice.enums.UserStatus;
 import jakarta.persistence.*;
@@ -46,12 +49,14 @@ public class User {
     @Column(nullable = false)
     private UserStatus status;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private UserRole role;
+    @Convert(converter = UserRoleConverter.class)
+    private List<UserRole> roles;
+
+    @Convert(converter = UserAuthorityConverter.class)
+    private List<UserAuthority> authorities = List.of();
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<UserProfile> userProfiles;
+    private List<Profile> profiles;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<Address> addresses;
