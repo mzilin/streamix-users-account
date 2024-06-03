@@ -15,8 +15,8 @@ import java.util.UUID;
 @Entity
 @Getter
 @Setter
-@Table(name = "user_profiles")
-public class UserProfile {
+@Table(name = "profiles")
+public class Profile {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -27,8 +27,8 @@ public class UserProfile {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "profile_name", nullable = false)
-    private String profileName;
+    @Column(nullable = false)
+    private String name;
 
     @Column(name = "avatar_url")
     private String avatarUrl;
