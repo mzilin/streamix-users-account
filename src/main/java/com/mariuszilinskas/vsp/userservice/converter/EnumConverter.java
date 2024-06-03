@@ -8,6 +8,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Converts a list of Enum values to a comma-separated String for database storage and
+ * converts back from the String to a List of Enum values for entity attribute.
+ *
+ * @param <E> the Enum type this converter handles
+ */
 @Converter
 public class EnumConverter<E extends Enum<E>> implements AttributeConverter<List<E>, String> {
 
