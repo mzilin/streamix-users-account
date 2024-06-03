@@ -1,7 +1,6 @@
 package com.mariuszilinskas.vsp.userservice.controller;
 
 import com.mariuszilinskas.vsp.userservice.dto.*;
-import com.mariuszilinskas.vsp.userservice.enums.UserRole;
 import com.mariuszilinskas.vsp.userservice.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -85,20 +84,18 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping("/{userId}/role")
-    public ResponseEntity<UserRole> getUserRole(
-            @PathVariable UUID userId
-    ){
-        UserRole userRole = userService.getUserRole(userId);
-        return new ResponseEntity<>(userRole, HttpStatus.OK);
-    }
-
-    @GetMapping("/data/id-by-email")
-    public ResponseEntity<UUID> getUserIdByEmail(
+    @GetMapping("/auth/details")
+    public ResponseEntity<AuthDetailsResponse> getUserAuthDetails(
             @Valid @RequestParam String email
     ){
-        UUID userId = userService.getUserIdByEmail(email);
-        return new ResponseEntity<>(userId, HttpStatus.OK);
+        AuthDetailsResponse authDetails = userService.getUserAuthDetails(email);
+        return new ResponseEntity<>(authDetails, HttpStatus.OK);
     }
+
+    // ------------------------------------------------------
+
+    // TODO: grant user role
+
+    // TODO: grant authority
 
 }

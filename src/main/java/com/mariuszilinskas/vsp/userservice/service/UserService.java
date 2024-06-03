@@ -1,7 +1,6 @@
 package com.mariuszilinskas.vsp.userservice.service;
 
 import com.mariuszilinskas.vsp.userservice.dto.*;
-import com.mariuszilinskas.vsp.userservice.enums.UserRole;
 
 import java.util.UUID;
 
@@ -17,9 +16,7 @@ public interface UserService {
 
     void verifyUser(UUID userId);
 
-    UUID getUserIdByEmail(String email);
-
-    UserRole getUserRole(UUID userId);
+    AuthDetailsResponse getUserAuthDetails(String email);
 
     void deleteUser(UUID userId, DeleteUserRequest request);
 
