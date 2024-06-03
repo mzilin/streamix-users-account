@@ -1,6 +1,6 @@
 package com.mariuszilinskas.vsp.userservice.dto;
 
-import com.mariuszilinskas.vsp.userservice.model.UserProfile;
+import com.mariuszilinskas.vsp.userservice.model.Profile;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -14,8 +14,9 @@ public record UserResponse(
         String country,
         boolean isEmailVerified,
         String status,
-        String role,
-        List<UserProfile> userProfiles,
+        List<String> roles,
+        List<String> authorities,
+        List<Profile> profiles,
         ZonedDateTime createdAt,
         ZonedDateTime lastActive
 ) {}
