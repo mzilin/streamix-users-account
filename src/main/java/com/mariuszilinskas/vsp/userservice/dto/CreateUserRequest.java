@@ -17,7 +17,6 @@ public record CreateUserRequest(
         String email,
 
         @NotBlank(message = "country cannot be blank")
-        @Email(message = "country should be valid")
         String country,
 
         @NotBlank(message = "password cannot be blank")
