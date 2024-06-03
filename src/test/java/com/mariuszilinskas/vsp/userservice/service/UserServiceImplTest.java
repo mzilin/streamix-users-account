@@ -22,10 +22,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -56,7 +58,8 @@ public class UserServiceImplTest {
         user.setEmail("john@example.com");
         user.setCountry("United Kingdom");
         user.setStatus(UserStatus.ACTIVE);
-        user.setRole(UserRole.USER);
+        user.setRoles(List.of(UserRole.USER));
+        user.setAuthorities(List.of());
 
         user2.setId(UUID.randomUUID());
         user2.setFirstName("Jane");
@@ -64,7 +67,8 @@ public class UserServiceImplTest {
         user2.setEmail("jane@example.com");
         user2.setCountry("United Kingdom");
         user.setStatus(UserStatus.ACTIVE);
-        user.setRole(UserRole.USER);
+        user.setRoles(List.of(UserRole.USER));
+        user.setAuthorities(List.of());
 
         createUserRequest = new CreateUserRequest(
                 user.getFirstName(),
@@ -86,6 +90,12 @@ public class UserServiceImplTest {
         feignException = new FeignException.NotFound(
                 "Not found", feignRequest, null, Collections.emptyMap()
         );
+    }
+
+    // ------------------------------------
+
+    private <E extends Enum<E>> List<String> convertEnumListToStringList(List<E> enumList) {
+        return enumList.stream().map(Enum::name).toList();
     }
 
     // ------------------------------------
@@ -139,7 +149,6 @@ public class UserServiceImplTest {
         // Arrange
         ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
         user.setStatus(UserStatus.PENDING);
-        user.setRole(UserRole.USER);
 
         when(userRepository.existsByEmail(createUserRequest.email()))
                 .thenReturn(false);
@@ -174,7 +183,9 @@ public class UserServiceImplTest {
         assertEquals(user.getLastName(), response.lastName());
         assertEquals(user.getEmail(), response.email());
         assertEquals(user.getStatus().name(), response.status());
-        assertEquals(user.getRole().name(), response.role());
+        assertThat(convertEnumListToStringList(user.getRoles())).containsExactlyInAnyOrderElementsOf(response.roles());
+        assertThat(convertEnumListToStringList(user.getAuthorities()))
+                .containsExactlyInAnyOrderElementsOf(response.authorities());
 
         verify(userRepository, times(1)).findById(userId);
     }
@@ -370,61 +381,34 @@ public class UserServiceImplTest {
     // ------------------------------------
 
     @Test
-    void tesGetUserIdByEmail_Success() {
+    void tesGetUserAuthDetails_Success() {
         // Arrange
         when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
 
         // Act
-        UUID id = userService.getUserIdByEmail(user.getEmail());
+        AuthDetailsResponse response = userService.getUserAuthDetails(user.getEmail());
 
         // Assert
-        assertNotNull(id);
-        assertEquals(userId, id);
+        assertNotNull(response);
+        assertEquals(userId, response.userId());
+        assertThat(convertEnumListToStringList(user.getRoles())).containsExactlyInAnyOrderElementsOf(response.roles());
+        assertThat(convertEnumListToStringList(user.getAuthorities()))
+                .containsExactlyInAnyOrderElementsOf(response.authorities());
 
         verify(userRepository, times(1)).findByEmail(user.getEmail());
     }
 
     @Test
-    void testGetUserIdByEmail_NonExistentUser() {
+    void testGetUserAuthDetails_NonExistentUser() {
         // Arrange
         String nonExistentUserEmail = "some@email.com";
         when(userRepository.findByEmail(nonExistentUserEmail)).thenReturn(Optional.empty());
 
         // Assert & Act
-        assertThrows(ResourceNotFoundException.class, () -> userService.getUserIdByEmail(nonExistentUserEmail));
+        assertThrows(ResourceNotFoundException.class, () -> userService.getUserAuthDetails(nonExistentUserEmail));
 
         // Assert
         verify(userRepository, times(1)).findByEmail(nonExistentUserEmail);
-    }
-
-    // ------------------------------------
-
-    @Test
-    void testGetUserRole_Success() {
-        // Arrange
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-
-        // Assert & Act
-        UserRole role = userService.getUserRole(userId);
-
-        // Assert
-        assertNotNull(role);
-        assertEquals(user.getRole(), role);
-
-        verify(userRepository, times(1)).findById(userId);
-    }
-
-    @Test
-    void testGetUserRole_NonExistentUser() {
-        // Arrange
-        UUID nonExistentId = UUID.randomUUID();
-        when(userRepository.findById(nonExistentId)).thenReturn(Optional.empty());
-
-        // Assert & Act
-        assertThrows(ResourceNotFoundException.class, () -> userService.getUserRole(nonExistentId));
-
-        // Assert
-        verify(userRepository, times(1)).findById(nonExistentId);
     }
 
     // ------------------------------------

@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -44,7 +45,7 @@ public class UserServiceImpl implements UserService {
         User createdUser = userRepository.save(newUser);
         createUserCredentials(createdUser.getId(), request.password());
 
-        return toUserResponse(createdUser);
+        return convertToUserResponse(createdUser);
     }
 
     private User populateNewUserWithRequestData(CreateUserRequest request) {
@@ -53,7 +54,7 @@ public class UserServiceImpl implements UserService {
         user.setLastName(request.lastName());
         user.setEmail(request.email());
         user.setCountry(request.country());
-        user.setRole(UserRole.USER);
+        user.setRoles(List.of(UserRole.USER));
         user.setStatus(UserStatus.PENDING);
 
         // TODO: create default profiles & avatars + UPDATE TESTS
@@ -77,7 +78,7 @@ public class UserServiceImpl implements UserService {
     public UserResponse getUser(UUID userId) {
         logger.info("Getting User [id: '{}'", userId);
         User user = findUserById(userId);
-        return toUserResponse(user);
+        return convertToUserResponse(user);
     }
 
     @Override
@@ -85,7 +86,7 @@ public class UserServiceImpl implements UserService {
         logger.info("Updating User [id: '{}']", userId);
         User user = findUserById(userId);
         applyUserUpdates(user, request);
-        return toUserResponse(user);
+        return convertToUserResponse(user);
     }
 
     private void applyUserUpdates(User user, UpdateUserRequest request) {
@@ -94,7 +95,7 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
-    private UserResponse toUserResponse(User user) {
+    private UserResponse convertToUserResponse(User user) {
         return new UserResponse(
                 user.getId(),
                 user.getFirstName(),
@@ -103,8 +104,9 @@ public class UserServiceImpl implements UserService {
                 user.getCountry(),
                 user.isEmailVerified(),
                 user.getStatus().name(),
-                user.getRole().name(),
-                user.getUserProfiles(),
+                convertEnumListToStringList(user.getRoles()),
+                convertEnumListToStringList(user.getAuthorities()),
+                user.getProfiles(),
                 user.getCreatedAt(),
                 user.getLastActive()
         );
@@ -159,22 +161,27 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UUID getUserIdByEmail(String email) {
-        logger.info("Getting User ID [email: '{}'", email);
+    public AuthDetailsResponse getUserAuthDetails(String email) {
+        logger.info("Getting Auth Details for User [email: '{}'", email);
         User user = findUserByEmail(email);
-        return user.getId();
+        return convertUserToAuthResponse(user);
+    }
+
+    private AuthDetailsResponse convertUserToAuthResponse(User user) {
+        return new AuthDetailsResponse(
+                user.getId(),
+                convertEnumListToStringList(user.getRoles()),
+                convertEnumListToStringList(user.getAuthorities())
+        );
+    }
+
+    private <E extends Enum<E>> List<String> convertEnumListToStringList(List<E> enumList) {
+        return enumList.stream().map(Enum::name).toList();
     }
 
     private User findUserByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException(User.class, "email", email));
-    }
-
-    @Override
-    public UserRole getUserRole(UUID userId) {
-        logger.info("Getting User Role for User [userId: '{}'", userId);
-        User user = findUserById(userId);
-        return user.getRole();
     }
 
     private User findUserById(UUID userId) {
