@@ -1,7 +1,5 @@
 package com.mariuszilinskas.vsp.userservice.dto;
 
-import com.mariuszilinskas.vsp.userservice.model.Profile;
-
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -16,7 +14,6 @@ public record UserResponse(
         String status,
         List<String> roles,
         List<String> authorities,
-        List<Profile> profiles,
         ZonedDateTime createdAt,
         ZonedDateTime lastActive
 ) {}

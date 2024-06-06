@@ -57,7 +57,7 @@ public class UserServiceImpl implements UserService {
         user.setRoles(List.of(UserRole.USER));
         user.setStatus(UserStatus.PENDING);
 
-        // TODO: create default profiles & avatars + UPDATE TESTS
+        // TODO: RABBIT_MQ create default profiles & avatars + UPDATE TESTS
 
         return user;
     }
@@ -106,7 +106,6 @@ public class UserServiceImpl implements UserService {
                 user.getStatus().name(),
                 convertEnumListToStringList(user.getRoles()),
                 convertEnumListToStringList(user.getAuthorities()),
-                user.getProfiles(),
                 user.getCreatedAt(),
                 user.getLastActive()
         );

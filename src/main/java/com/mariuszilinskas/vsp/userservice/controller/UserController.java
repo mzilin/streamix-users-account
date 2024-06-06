@@ -65,15 +65,6 @@ public class UserController {
     // TODO: update address
     // TODO: delete address
 
-    // TODO: add profile
-    // TODO: get user profiles???
-    // TODO: update profile
-    // TODO: delete profile
-
-    // TODO: create, get, update watchlist
-
-    // TODO: update, get viewing history
-
     // ------------------------------------------------------
 
     @PatchMapping("/{userId}/verify")

@@ -56,9 +56,6 @@ public class User {
     private List<UserAuthority> authorities = List.of();
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<Profile> profiles;
-
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<Address> addresses;
 
     @Column(name = "created_at", nullable = false)
