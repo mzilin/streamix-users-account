@@ -21,9 +21,9 @@ import java.util.Map;
  * @author Marius Zilinskas
  */
 @RestControllerAdvice
-public class UserExceptionHandler {
+public class AppExceptionHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(UserExceptionHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(AppExceptionHandler.class);
 
     // ----------------- Request Validations ----------------------
 
