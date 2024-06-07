@@ -159,17 +159,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public AuthDetailsResponse getUserAuthDetails(String email) {
+    public AuthDetailsResponse getUserAuthDetailsWithEmail(String email) {
         logger.info("Getting Auth Details for User [email: '{}'", email);
         User user = findUserByEmail(email);
+        return convertUserToAuthResponse(user);
+    }
+
+    @Override
+    public AuthDetailsResponse getUserAuthDetailsWithId(UUID userId) {
+        logger.info("Getting Auth Details for User [id: '{}'", userId);
+        User user = findUserById(userId);
         return convertUserToAuthResponse(user);
     }
 
     private AuthDetailsResponse convertUserToAuthResponse(User user) {
         return new AuthDetailsResponse(
                 user.getId(),
-                convertEnumListToStringList(user.getRoles()),
-                convertEnumListToStringList(user.getAuthorities())
+                user.getRoles(),
+                user.getAuthorities(),
+                user.getStatus()
         );
     }
 

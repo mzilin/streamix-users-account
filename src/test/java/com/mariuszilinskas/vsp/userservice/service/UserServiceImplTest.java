@@ -10,9 +10,8 @@ import com.mariuszilinskas.vsp.userservice.exception.ResourceNotFoundException;
 import com.mariuszilinskas.vsp.userservice.exception.UserRegistrationException;
 import com.mariuszilinskas.vsp.userservice.model.User;
 import com.mariuszilinskas.vsp.userservice.repository.UserRepository;
+import com.mariuszilinskas.vsp.userservice.util.TestUtils;
 import feign.FeignException;
-import feign.Request;
-import feign.RequestTemplate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,7 +20,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -43,7 +41,7 @@ public class UserServiceImplTest {
     UserServiceImpl userService;
 
     private CreateUserRequest createUserRequest;
-    private FeignException feignException;
+    private final FeignException feignException = TestUtils.createFeignException();
     private final UUID userId = UUID.randomUUID();
     private final User user = new User();
     private final User user2 = new User();
@@ -76,19 +74,6 @@ public class UserServiceImplTest {
                 user.getEmail(),
                 user.getCountry(),
                 "Password123!"
-        );
-
-        // Empty string for URL as a placeholder
-        Request feignRequest = Request.create(
-                Request.HttpMethod.POST,
-                "", // Empty string for URL as a placeholder
-                Collections.emptyMap(),
-                null,
-                new RequestTemplate()
-        );
-
-        feignException = new FeignException.NotFound(
-                "Not found", feignRequest, null, Collections.emptyMap()
         );
     }
 
@@ -381,34 +366,65 @@ public class UserServiceImplTest {
     // ------------------------------------
 
     @Test
-    void tesGetUserAuthDetails_Success() {
+    void tesGetUserAuthDetailsWithEmail_Success() {
         // Arrange
         when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
 
         // Act
-        AuthDetailsResponse response = userService.getUserAuthDetails(user.getEmail());
+        AuthDetailsResponse response = userService.getUserAuthDetailsWithEmail(user.getEmail());
 
         // Assert
         assertNotNull(response);
         assertEquals(userId, response.userId());
-        assertThat(convertEnumListToStringList(user.getRoles())).containsExactlyInAnyOrderElementsOf(response.roles());
-        assertThat(convertEnumListToStringList(user.getAuthorities()))
-                .containsExactlyInAnyOrderElementsOf(response.authorities());
+        assertThat(user.getRoles()).containsExactlyInAnyOrderElementsOf(response.roles());
+        assertThat(user.getAuthorities()).containsExactlyInAnyOrderElementsOf(response.authorities());
 
         verify(userRepository, times(1)).findByEmail(user.getEmail());
     }
 
     @Test
-    void testGetUserAuthDetails_NonExistentUser() {
+    void testGetUserAuthDetailsWithEmail_NonExistentUser() {
         // Arrange
         String nonExistentUserEmail = "some@email.com";
         when(userRepository.findByEmail(nonExistentUserEmail)).thenReturn(Optional.empty());
 
         // Assert & Act
-        assertThrows(ResourceNotFoundException.class, () -> userService.getUserAuthDetails(nonExistentUserEmail));
+        assertThrows(ResourceNotFoundException.class, () -> userService.getUserAuthDetailsWithEmail(nonExistentUserEmail));
 
         // Assert
         verify(userRepository, times(1)).findByEmail(nonExistentUserEmail);
+    }
+
+    // ------------------------------------
+
+    @Test
+    void tesGetUserAuthDetailsWithId_Success() {
+        // Arrange
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+        // Act
+        AuthDetailsResponse response = userService.getUserAuthDetailsWithId(userId);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(userId, response.userId());
+        assertThat(user.getRoles()).containsExactlyInAnyOrderElementsOf(response.roles());
+        assertThat(user.getAuthorities()).containsExactlyInAnyOrderElementsOf(response.authorities());
+
+        verify(userRepository, times(1)).findById(userId);
+    }
+
+    @Test
+    void testGetUserAuthDetailsWithId_NonExistentUser() {
+        // Arrange
+        UUID nonExistentUserEId = UUID.randomUUID();
+        when(userRepository.findById(nonExistentUserEId)).thenReturn(Optional.empty());
+
+        // Assert & Act
+        assertThrows(ResourceNotFoundException.class, () -> userService.getUserAuthDetailsWithId(nonExistentUserEId));
+
+        // Assert
+        verify(userRepository, times(1)).findById(nonExistentUserEId);
     }
 
     // ------------------------------------

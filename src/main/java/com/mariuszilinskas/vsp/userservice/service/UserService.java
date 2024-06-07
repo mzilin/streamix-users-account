@@ -16,7 +16,9 @@ public interface UserService {
 
     void verifyUser(UUID userId);
 
-    AuthDetailsResponse getUserAuthDetails(String email);
+    AuthDetailsResponse getUserAuthDetailsWithEmail(String email);
+
+    AuthDetailsResponse getUserAuthDetailsWithId(UUID id);
 
     void deleteUser(UUID userId, DeleteUserRequest request);
 
