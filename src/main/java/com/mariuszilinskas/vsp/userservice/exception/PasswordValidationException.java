@@ -5,4 +5,5 @@ public class PasswordValidationException extends RuntimeException {
     public PasswordValidationException() {
         super("Password validation failed");
     }
+
 }

@@ -6,4 +6,5 @@ public class ResourceNotFoundException extends RuntimeException {
         super(String.format("No %s found with %s = '%s'. Please check the %s and try again.",
                 entity.getSimpleName(), identifierType, identifierValue, identifierType));
     }
+
 }

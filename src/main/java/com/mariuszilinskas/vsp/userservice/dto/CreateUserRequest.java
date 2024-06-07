@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public record CreateUserRequest(
+
         @NotBlank(message = "firstName cannot be blank")
         String firstName,
 
@@ -29,6 +30,7 @@ public record CreateUserRequest(
                         message = "password must contain at least one special character")
         })
         String password
+
 ) {
         public CreateUserRequest {
                 if (firstName != null) firstName = firstName.trim();

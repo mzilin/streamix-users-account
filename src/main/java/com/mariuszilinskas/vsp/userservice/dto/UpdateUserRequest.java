@@ -3,6 +3,7 @@ package com.mariuszilinskas.vsp.userservice.dto;
 import jakarta.validation.constraints.NotBlank;
 
 public record UpdateUserRequest(
+
         @NotBlank(message = "firstName cannot be blank")
         String firstName,
 

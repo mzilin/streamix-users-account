@@ -191,4 +191,5 @@ public class UserServiceImpl implements UserService {
     public void deleteUser(UUID userId, DeleteUserRequest request) {
         // TODO: RabbitMQ to all services for user data deletion
     }
+
 }
