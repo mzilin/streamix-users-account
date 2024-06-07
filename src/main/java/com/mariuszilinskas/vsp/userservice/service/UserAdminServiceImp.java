@@ -2,12 +2,15 @@ package com.mariuszilinskas.vsp.userservice.service;
 
 import com.mariuszilinskas.vsp.userservice.enums.UserAuthority;
 import com.mariuszilinskas.vsp.userservice.enums.UserRole;
+import com.mariuszilinskas.vsp.userservice.exception.ResourceNotFoundException;
+import com.mariuszilinskas.vsp.userservice.model.User;
 import com.mariuszilinskas.vsp.userservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -25,12 +28,30 @@ public class UserAdminServiceImp implements UserAdminService {
 
     @Override
     public void grantUserRole(UUID userId, UserRole userRole) {
+        logger.info("Granting '{}' Role for User [id: '{}']", userRole, userId);
 
+        User user = findUserById(userId);
+        List<UserRole> roles = user.getRoles();
+
+        if (!roles.contains(userRole)) {
+            roles.add(userRole);
+            user.setRoles(roles);
+            userRepository.save(user);
+        }
     }
 
     @Override
     public void removeUserRole(UUID userId, UserRole userRole) {
+        logger.info("Removing '{}' Role for User [id: '{}']", userRole, userId);
 
+        User user = findUserById(userId);
+        List<UserRole> roles = user.getRoles();
+
+        if (roles.contains(userRole)) {
+            roles.remove(userRole);
+            user.setRoles(roles);
+            userRepository.save(user);
+        }
     }
 
     @Override
@@ -46,6 +67,11 @@ public class UserAdminServiceImp implements UserAdminService {
     @Override
     public void suspendUser(UUID userId) {
 
+    }
+
+    private User findUserById(UUID userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException(User.class, "id", userId));
     }
 
 }
