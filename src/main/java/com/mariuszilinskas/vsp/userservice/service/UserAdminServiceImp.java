@@ -2,6 +2,7 @@ package com.mariuszilinskas.vsp.userservice.service;
 
 import com.mariuszilinskas.vsp.userservice.enums.UserAuthority;
 import com.mariuszilinskas.vsp.userservice.enums.UserRole;
+import com.mariuszilinskas.vsp.userservice.enums.UserStatus;
 import com.mariuszilinskas.vsp.userservice.exception.ResourceNotFoundException;
 import com.mariuszilinskas.vsp.userservice.model.User;
 import com.mariuszilinskas.vsp.userservice.repository.UserRepository;
@@ -84,8 +85,11 @@ public class UserAdminServiceImp implements UserAdminService {
     }
 
     @Override
-    public void suspendUser(UUID userId) {
-
+    public void updateUserStatus(UUID userId, UserStatus status) {
+        logger.info("Setting status '{}' for User [id: '{}']", status, userId);
+        User user = findUserById(userId);
+        user.setStatus(status);
+        userRepository.save(user);
     }
 
     private User findUserById(UUID userId) {

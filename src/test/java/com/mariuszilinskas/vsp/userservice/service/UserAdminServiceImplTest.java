@@ -194,10 +194,43 @@ public class UserAdminServiceImplTest {
     // ------------------------------------
 
     @Test
-    void testSuspendUser_Success() {
-        // TODO:
+    void testUpdateUserStatus_Suspend() {
+        // Arrange
+        user.setStatus(UserStatus.ACTIVE);
+        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(userRepository.save(captor.capture())).thenReturn(user);
+
+        // Act
+        userAdminService.updateUserStatus(userId, UserStatus.SUSPENDED);
+
+        // Assert
+        verify(userRepository, times(1)).findById(userId);
+        verify(userRepository, times(1)).save(captor.capture());
+
+        User savedUser = captor.getValue();
+        assertEquals(UserStatus.SUSPENDED, savedUser.getStatus());
     }
 
-    // ------------------------------------
+    @Test
+    void testUpdateUserStatus_Reactivate() {
+        // Arrange
+        user.setStatus(UserStatus.SUSPENDED);
+        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(userRepository.save(captor.capture())).thenReturn(user);
+
+        // Act
+        userAdminService.updateUserStatus(userId, UserStatus.ACTIVE);
+
+        // Assert
+        verify(userRepository, times(1)).findById(userId);
+        verify(userRepository, times(1)).save(captor.capture());
+
+        User savedUser = captor.getValue();
+        assertEquals(UserStatus.ACTIVE, savedUser.getStatus());
+    }
 
 }
