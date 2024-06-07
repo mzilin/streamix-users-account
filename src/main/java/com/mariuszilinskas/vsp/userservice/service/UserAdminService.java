@@ -5,7 +5,7 @@ import com.mariuszilinskas.vsp.userservice.enums.UserRole;
 
 import java.util.UUID;
 
-public interface AdminService {
+public interface UserAdminService {
 
     void grantUserRole(UUID userId, UserRole userRole);
 

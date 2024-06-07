@@ -2,7 +2,7 @@ package com.mariuszilinskas.vsp.userservice.controller;
 
 import com.mariuszilinskas.vsp.userservice.enums.UserAuthority;
 import com.mariuszilinskas.vsp.userservice.enums.UserRole;
-import com.mariuszilinskas.vsp.userservice.service.AdminService;
+import com.mariuszilinskas.vsp.userservice.service.UserAdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,16 +19,16 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/admin")
 @RequiredArgsConstructor
-public class AdminController {
+public class UserAdminController {
 
-    private final AdminService adminService;
+    private final UserAdminService userAdminService;
 
     @PostMapping("/{userId}/role/{userRole}")
     public ResponseEntity<Void> grantUserRole(
             @PathVariable UUID userId,
             @PathVariable UserRole userRole
     ){
-        adminService.grantUserRole(userId, userRole);
+        userAdminService.grantUserRole(userId, userRole);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -37,7 +37,7 @@ public class AdminController {
             @PathVariable UUID userId,
             @PathVariable UserRole userRole
     ){
-        adminService.removeUserRole(userId, userRole);
+        userAdminService.removeUserRole(userId, userRole);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -46,7 +46,7 @@ public class AdminController {
             @PathVariable UUID userId,
             @PathVariable UserAuthority authority
     ){
-        adminService.grantUserAuthority(userId, authority);
+        userAdminService.grantUserAuthority(userId, authority);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -55,13 +55,13 @@ public class AdminController {
             @PathVariable UUID userId,
             @PathVariable UserAuthority authority
     ){
-        adminService.removeUserAuthority(userId, authority);
+        userAdminService.removeUserAuthority(userId, authority);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PatchMapping("/{userId}/suspend")
     public ResponseEntity<Void> suspendUer(@PathVariable UUID userId){
-        adminService.suspendUser(userId);
+        userAdminService.suspendUser(userId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

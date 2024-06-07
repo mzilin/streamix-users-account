@@ -31,7 +31,6 @@ import java.util.UUID;
 public class UserServiceImpl implements UserService {
 
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
-
     private final AuthFeignClient authFeignClient;
     private final UserRepository userRepository;
 
