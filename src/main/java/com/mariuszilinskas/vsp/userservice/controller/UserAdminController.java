@@ -2,6 +2,7 @@ package com.mariuszilinskas.vsp.userservice.controller;
 
 import com.mariuszilinskas.vsp.userservice.enums.UserAuthority;
 import com.mariuszilinskas.vsp.userservice.enums.UserRole;
+import com.mariuszilinskas.vsp.userservice.enums.UserStatus;
 import com.mariuszilinskas.vsp.userservice.service.UserAdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -59,9 +60,12 @@ public class UserAdminController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PatchMapping("/{userId}/suspend")
-    public ResponseEntity<Void> suspendUer(@PathVariable UUID userId){
-        userAdminService.suspendUser(userId);
+    @PatchMapping("/{userId}/status/{status}")
+    public ResponseEntity<Void> updateUserStatus(
+            @PathVariable UUID userId,
+            @PathVariable UserStatus status
+    ){
+        userAdminService.updateUserStatus(userId, status);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
