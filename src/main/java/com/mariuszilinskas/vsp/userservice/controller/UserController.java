@@ -3,6 +3,7 @@ package com.mariuszilinskas.vsp.userservice.controller;
 import com.mariuszilinskas.vsp.userservice.dto.*;
 import com.mariuszilinskas.vsp.userservice.service.UserService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,9 +32,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<UserResponse> getUser(
-            @PathVariable UUID userId
-    ) {
+    public ResponseEntity<UserResponse> getUser(@PathVariable UUID userId) {
         UserResponse response = userService.getUser(userId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -68,25 +67,17 @@ public class UserController {
     // ------------------------------------------------------
 
     @PatchMapping("/{userId}/verify")
-    public ResponseEntity<Void> verifyUser(
-            @PathVariable UUID userId
-    ){
+    public ResponseEntity<Void> verifyUser(@PathVariable UUID userId){
         userService.verifyUser(userId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @GetMapping("/auth/details")
     public ResponseEntity<AuthDetailsResponse> getUserAuthDetails(
-            @Valid @RequestParam String email
+            @Valid @Email @RequestParam String email
     ){
         AuthDetailsResponse authDetails = userService.getUserAuthDetails(email);
         return new ResponseEntity<>(authDetails, HttpStatus.OK);
     }
-
-    // ------------------------------------------------------
-
-    // TODO: grant user role
-
-    // TODO: grant authority
 
 }
