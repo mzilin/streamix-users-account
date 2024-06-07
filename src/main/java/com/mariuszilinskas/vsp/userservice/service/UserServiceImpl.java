@@ -103,8 +103,8 @@ public class UserServiceImpl implements UserService {
                 user.getCountry(),
                 user.isEmailVerified(),
                 user.getStatus().name(),
-                convertEnumListToStringList(user.getRoles()),
-                convertEnumListToStringList(user.getAuthorities()),
+                user.getRoles(),
+                user.getAuthorities(),
                 user.getCreatedAt(),
                 user.getLastActive()
         );
@@ -179,10 +179,6 @@ public class UserServiceImpl implements UserService {
                 user.getAuthorities(),
                 user.getStatus()
         );
-    }
-
-    private <E extends Enum<E>> List<String> convertEnumListToStringList(List<E> enumList) {
-        return enumList.stream().map(Enum::name).toList();
     }
 
     private User findUserByEmail(String email) {

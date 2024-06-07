@@ -79,12 +79,6 @@ public class UserServiceImplTest {
 
     // ------------------------------------
 
-    private <E extends Enum<E>> List<String> convertEnumListToStringList(List<E> enumList) {
-        return enumList.stream().map(Enum::name).toList();
-    }
-
-    // ------------------------------------
-
     @Test
     void testCreateUser_Success() {
         // Arrange
@@ -168,9 +162,8 @@ public class UserServiceImplTest {
         assertEquals(user.getLastName(), response.lastName());
         assertEquals(user.getEmail(), response.email());
         assertEquals(user.getStatus().name(), response.status());
-        assertThat(convertEnumListToStringList(user.getRoles())).containsExactlyInAnyOrderElementsOf(response.roles());
-        assertThat(convertEnumListToStringList(user.getAuthorities()))
-                .containsExactlyInAnyOrderElementsOf(response.authorities());
+        assertThat(user.getRoles()).containsExactlyInAnyOrderElementsOf(response.roles());
+        assertThat(user.getAuthorities()).containsExactlyInAnyOrderElementsOf(response.authorities());
 
         verify(userRepository, times(1)).findById(userId);
     }
