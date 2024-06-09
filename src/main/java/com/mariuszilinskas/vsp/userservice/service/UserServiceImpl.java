@@ -43,10 +43,11 @@ public class UserServiceImpl implements UserService {
 
         checkEmailExists(request.email());
         User newUser = populateNewUserWithRequestData(request);
-        User createdUser = userRepository.save(newUser);
-        createUserCredentials(createdUser.getId(), request.password());
+        createUserCredentials(newUser.getId(), request.password());
 
-        return UserUtils.mapToUserResponse(createdUser);
+        // TODO: RABBIT_MQ create default profiles & avatars + UPDATE TESTS
+
+        return UserUtils.mapToUserResponse(newUser);
     }
 
     private User populateNewUserWithRequestData(CreateUserRequest request) {
@@ -57,10 +58,7 @@ public class UserServiceImpl implements UserService {
         user.setCountry(request.country());
         user.setRoles(List.of(UserRole.USER));
         user.setStatus(UserStatus.PENDING);
-
-        // TODO: RABBIT_MQ create default profiles & avatars + UPDATE TESTS
-
-        return user;
+        return userRepository.save(user);
     }
 
     private void createUserCredentials(UUID userId, String password) {
@@ -185,6 +183,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void deleteUser(UUID userId, DeleteUserRequest request) {
         // TODO: RabbitMQ to all services for user data deletion
     }
