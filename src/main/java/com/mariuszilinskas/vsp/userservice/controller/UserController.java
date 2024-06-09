@@ -17,7 +17,7 @@ import java.util.UUID;
  * @author Marius Zilinskas
  */
 @RestController
-@RequestMapping()
+@RequestMapping("/user")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -57,22 +57,13 @@ public class UserController {
 
     // ------------------------------------------------------
 
-//    @PostMapping("/{userId}/address")
-//    public
-
-    // TODO: add address
-    // TODO: update address
-    // TODO: delete address
-
-    // ------------------------------------------------------
-
     @PatchMapping("/{userId}/verify")
     public ResponseEntity<Void> verifyUser(@PathVariable UUID userId){
         userService.verifyUser(userId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping("/auth/details/email")
+    @GetMapping("/auth-details/email")
     public ResponseEntity<AuthDetailsResponse> getUserAuthDetailsWithEmail(
             @Valid @Email @RequestParam String email
     ){
@@ -80,7 +71,7 @@ public class UserController {
         return new ResponseEntity<>(authDetails, HttpStatus.OK);
     }
 
-    @GetMapping("/auth/details/id")
+    @GetMapping("/auth-details/id")
     public ResponseEntity<AuthDetailsResponse> getUserAuthDetailsWithId(
             @Valid @RequestParam UUID userId
     ){

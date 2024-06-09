@@ -14,6 +14,12 @@ public interface UserService {
 
     UpdateEmailResponse updateUserEmail(UUID userId, UpdateEmailRequest request);
 
+    // TODO: add address
+
+    // TODO: update address
+
+    // TODO: delete address
+
     void verifyUser(UUID userId);
 
     AuthDetailsResponse getUserAuthDetailsWithEmail(String email);
