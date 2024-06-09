@@ -76,8 +76,7 @@ public class AddressServiceImpl implements AddressService {
         address.setCounty(request.county());
         address.setCountry(request.country());
         address.setPostcode(request.postcode());
-        addressRepository.save(address);
-        return address;
+        return addressRepository.save(address);
     }
 
     @Override
