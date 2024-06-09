@@ -32,7 +32,6 @@ public class UserAdminServiceImplTest {
     UserAdminServiceImp userAdminService;
 
     private final UUID userId = UUID.randomUUID();
-    private final UUID user2Id = UUID.randomUUID();
     private final User user = new User();
     private final User user2 = new User();
 
@@ -49,7 +48,7 @@ public class UserAdminServiceImplTest {
         user.setRoles(List.of(UserRole.USER));
         user.setAuthorities(List.of());
 
-        user2.setId(user2Id);
+        user2.setId(UUID.randomUUID());
         user2.setFirstName("Jane");
         user2.setLastName("Doe");
         user2.setEmail("jane@example.com");
