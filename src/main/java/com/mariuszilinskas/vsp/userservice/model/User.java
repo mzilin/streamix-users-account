@@ -55,9 +55,6 @@ public class User {
     @Convert(converter = UserAuthorityConverter.class)
     private List<UserAuthority> authorities = List.of();
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<Address> addresses;
-
     @Column(name = "created_at", nullable = false)
     private ZonedDateTime createdAt = ZonedDateTime.now();
 

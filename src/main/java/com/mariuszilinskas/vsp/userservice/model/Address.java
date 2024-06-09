@@ -24,9 +24,8 @@ public class Address {
     @Column(updatable = false, nullable = false)
     private UUID id;
 
-    @ManyToOne(cascade = CascadeType.REMOVE)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @Column(name = "user_id", nullable = false)
+    private UUID userId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "address_type", nullable = false)
