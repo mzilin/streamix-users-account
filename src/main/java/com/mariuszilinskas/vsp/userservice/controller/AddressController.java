@@ -47,7 +47,7 @@ public class AddressController {
     }
 
     @PutMapping("/{userId}/{addressId}")
-    public ResponseEntity<UserResponse> updateAddress(
+    public ResponseEntity<AddressResponse> updateAddress(
             @PathVariable UUID userId,
             @PathVariable UUID addressId,
             @Valid @RequestBody UpdateAddressRequest request
