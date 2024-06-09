@@ -1,6 +1,7 @@
 package com.mariuszilinskas.vsp.userservice.controller;
 
 import com.mariuszilinskas.vsp.userservice.dto.*;
+import com.mariuszilinskas.vsp.userservice.model.Address;
 import com.mariuszilinskas.vsp.userservice.service.AddressService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,35 +25,36 @@ public class AddressController {
     private final AddressService addressService;
 
     @PostMapping("/{userId}")
-    public ResponseEntity<AddressResponse> createAddress(
+    public ResponseEntity<Address> createAddress(
+            @PathVariable UUID userId,
             @Valid @RequestBody UpdateAddressRequest request
     ) {
-        AddressResponse response = addressService.createAddress(request);
+        Address response = addressService.createAddress(userId, request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<List<AddressResponse>> getAllAddresses(@PathVariable UUID userId) {
-        List<AddressResponse> response = addressService.getAllAddresses(userId);
+    public ResponseEntity<List<Address>> getAllAddresses(@PathVariable UUID userId) {
+        List<Address> response = addressService.getAllAddresses(userId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/{userId}/{addressId}")
-    public ResponseEntity<AddressResponse> getAddress(
+    public ResponseEntity<Address> getAddress(
             @PathVariable UUID userId,
             @PathVariable UUID addressId
     ) {
-        AddressResponse response = addressService.getAddress(userId, addressId);
+        Address response = addressService.getAddress(userId, addressId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PutMapping("/{userId}/{addressId}")
-    public ResponseEntity<AddressResponse> updateAddress(
+    public ResponseEntity<Address> updateAddress(
             @PathVariable UUID userId,
             @PathVariable UUID addressId,
             @Valid @RequestBody UpdateAddressRequest request
     ) {
-        AddressResponse response = addressService.updateAddress(userId, addressId, request);
+        Address response = addressService.updateAddress(userId, addressId, request);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

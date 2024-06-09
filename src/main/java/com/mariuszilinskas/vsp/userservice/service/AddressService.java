@@ -1,19 +1,20 @@
 package com.mariuszilinskas.vsp.userservice.service;
 
 import com.mariuszilinskas.vsp.userservice.dto.*;
+import com.mariuszilinskas.vsp.userservice.model.Address;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface AddressService {
 
-    AddressResponse createAddress(UpdateAddressRequest request);
+    Address createAddress(UUID userId, UpdateAddressRequest request);
 
-    List<AddressResponse> getAllAddresses(UUID userId);
+    List<Address> getAllAddresses(UUID userId);
 
-    AddressResponse getAddress(UUID userId, UUID addressId);
+    Address getAddress(UUID userId, UUID addressId);
 
-    AddressResponse updateAddress(UUID userId, UUID addressId, UpdateAddressRequest request);
+    Address updateAddress(UUID userId, UUID addressId, UpdateAddressRequest request);
 
     void deleteAddress(UUID userId, UUID addressId);
 
