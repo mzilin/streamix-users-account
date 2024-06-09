@@ -28,6 +28,10 @@ public class Address {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "address_type", nullable = false)
+    private AddressType addressType;
+
     @Column(name = "street_1", nullable = false)
     private String street1;
 
@@ -45,9 +49,5 @@ public class Address {
 
     @Column(nullable = false)
     private String postcode;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "address_type", nullable = false)
-    private AddressType addressType;
 
 }
