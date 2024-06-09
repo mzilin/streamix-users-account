@@ -63,19 +63,19 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping("/auth-details/email")
-    public ResponseEntity<AuthDetailsResponse> getUserAuthDetailsWithEmail(
+    @GetMapping("/auth-details/by-email")
+    public ResponseEntity<AuthDetailsResponse> getUserAuthDetailsByEmail(
             @Valid @Email @RequestParam String email
     ){
-        AuthDetailsResponse authDetails = userService.getUserAuthDetailsWithEmail(email);
+        AuthDetailsResponse authDetails = userService.getUserAuthDetailsByEmail(email);
         return new ResponseEntity<>(authDetails, HttpStatus.OK);
     }
 
-    @GetMapping("/auth-details/id")
-    public ResponseEntity<AuthDetailsResponse> getUserAuthDetailsWithId(
+    @GetMapping("/auth-details/by-userid")
+    public ResponseEntity<AuthDetailsResponse> getUserAuthDetailsByUserId(
             @Valid @RequestParam UUID userId
     ){
-        AuthDetailsResponse authDetails = userService.getUserAuthDetailsWithId(userId);
+        AuthDetailsResponse authDetails = userService.getUserAuthDetailsByUserId(userId);
         return new ResponseEntity<>(authDetails, HttpStatus.OK);
     }
 

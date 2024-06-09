@@ -20,6 +20,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -362,10 +364,11 @@ public class UserServiceImplTest {
     @Test
     void tesGetUserAuthDetailsWithEmail_Success() {
         // Arrange
+        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
         when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
 
         // Act
-        AuthDetailsResponse response = userService.getUserAuthDetailsWithEmail(user.getEmail());
+        AuthDetailsResponse response = userService.getUserAuthDetailsByEmail(user.getEmail());
 
         // Assert
         assertNotNull(response);
@@ -374,6 +377,13 @@ public class UserServiceImplTest {
         assertThat(user.getAuthorities()).containsExactlyInAnyOrderElementsOf(response.authorities());
 
         verify(userRepository, times(1)).findByEmail(user.getEmail());
+        verify(userRepository, times(1)).save(captor.capture());
+
+        User savedUser = captor.getValue();
+        ZonedDateTime now = ZonedDateTime.now();
+        ZonedDateTime savedUserLastActive = savedUser.getLastActive();
+        long secondsDifference = Math.abs(ChronoUnit.SECONDS.between(now, savedUserLastActive));
+        assertTrue(secondsDifference <= 1); // 1 second tolerance
     }
 
     @Test
@@ -383,10 +393,11 @@ public class UserServiceImplTest {
         when(userRepository.findByEmail(nonExistentUserEmail)).thenReturn(Optional.empty());
 
         // Assert & Act
-        assertThrows(ResourceNotFoundException.class, () -> userService.getUserAuthDetailsWithEmail(nonExistentUserEmail));
+        assertThrows(ResourceNotFoundException.class, () -> userService.getUserAuthDetailsByEmail(nonExistentUserEmail));
 
         // Assert
         verify(userRepository, times(1)).findByEmail(nonExistentUserEmail);
+        verify(userRepository, never()).save(any(User.class));
     }
 
     // ------------------------------------
@@ -394,10 +405,12 @@ public class UserServiceImplTest {
     @Test
     void tesGetUserAuthDetailsWithId_Success() {
         // Arrange
+        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(userRepository.save(captor.capture())).thenReturn(user);
 
         // Act
-        AuthDetailsResponse response = userService.getUserAuthDetailsWithId(userId);
+        AuthDetailsResponse response = userService.getUserAuthDetailsByUserId(userId);
 
         // Assert
         assertNotNull(response);
@@ -406,6 +419,13 @@ public class UserServiceImplTest {
         assertThat(user.getAuthorities()).containsExactlyInAnyOrderElementsOf(response.authorities());
 
         verify(userRepository, times(1)).findById(userId);
+        verify(userRepository, times(1)).save(captor.capture());
+
+        User savedUser = captor.getValue();
+        ZonedDateTime now = ZonedDateTime.now();
+        ZonedDateTime savedUserLastActive = savedUser.getLastActive();
+        long secondsDifference = Math.abs(ChronoUnit.SECONDS.between(now, savedUserLastActive));
+        assertTrue(secondsDifference <= 1); // 1 second tolerance
     }
 
     @Test
@@ -415,12 +435,11 @@ public class UserServiceImplTest {
         when(userRepository.findById(nonExistentUserEId)).thenReturn(Optional.empty());
 
         // Assert & Act
-        assertThrows(ResourceNotFoundException.class, () -> userService.getUserAuthDetailsWithId(nonExistentUserEId));
+        assertThrows(ResourceNotFoundException.class, () -> userService.getUserAuthDetailsByUserId(nonExistentUserEId));
 
         // Assert
         verify(userRepository, times(1)).findById(nonExistentUserEId);
+        verify(userRepository, never()).save(any(User.class));
     }
-
-    // ------------------------------------
 
 }

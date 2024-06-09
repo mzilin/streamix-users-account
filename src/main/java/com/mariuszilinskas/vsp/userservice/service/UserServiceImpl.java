@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -44,7 +45,7 @@ public class UserServiceImpl implements UserService {
         User createdUser = userRepository.save(newUser);
         createUserCredentials(createdUser.getId(), request.password());
 
-        return convertToUserResponse(createdUser);
+        return mapToUserResponse(createdUser);
     }
 
     private User populateNewUserWithRequestData(CreateUserRequest request) {
@@ -77,7 +78,7 @@ public class UserServiceImpl implements UserService {
     public UserResponse getUser(UUID userId) {
         logger.info("Getting User [id: '{}'", userId);
         User user = findUserById(userId);
-        return convertToUserResponse(user);
+        return mapToUserResponse(user);
     }
 
     @Override
@@ -85,7 +86,7 @@ public class UserServiceImpl implements UserService {
         logger.info("Updating User [id: '{}']", userId);
         User user = findUserById(userId);
         applyUserUpdates(user, request);
-        return convertToUserResponse(user);
+        return mapToUserResponse(user);
     }
 
     private void applyUserUpdates(User user, UpdateUserRequest request) {
@@ -95,7 +96,7 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
-    private UserResponse convertToUserResponse(User user) {
+    private UserResponse mapToUserResponse(User user) {
         return new UserResponse(
                 user.getId(),
                 user.getFirstName(),
@@ -160,20 +161,26 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public AuthDetailsResponse getUserAuthDetailsWithEmail(String email) {
+    public AuthDetailsResponse getUserAuthDetailsByEmail(String email) {
         logger.info("Getting Auth Details for User [email: '{}'", email);
         User user = findUserByEmail(email);
-        return convertUserToAuthResponse(user);
+        return updateLastActiveAndMapToAuthResponse(user);
     }
 
     @Override
-    public AuthDetailsResponse getUserAuthDetailsWithId(UUID userId) {
+    public AuthDetailsResponse getUserAuthDetailsByUserId(UUID userId) {
         logger.info("Getting Auth Details for User [id: '{}'", userId);
         User user = findUserById(userId);
-        return convertUserToAuthResponse(user);
+        return updateLastActiveAndMapToAuthResponse(user);
     }
 
-    private AuthDetailsResponse convertUserToAuthResponse(User user) {
+    private AuthDetailsResponse updateLastActiveAndMapToAuthResponse(User user) {
+        user.setLastActive(ZonedDateTime.now());
+        userRepository.save(user);
+        return mapUserToAuthResponse(user);
+    }
+
+    private AuthDetailsResponse mapUserToAuthResponse(User user) {
         return new AuthDetailsResponse(
                 user.getId(),
                 user.getRoles(),
