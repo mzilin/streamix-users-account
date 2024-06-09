@@ -1,5 +1,6 @@
 package com.mariuszilinskas.vsp.userservice.controller;
 
+import com.mariuszilinskas.vsp.userservice.dto.UserResponse;
 import com.mariuszilinskas.vsp.userservice.enums.UserAuthority;
 import com.mariuszilinskas.vsp.userservice.enums.UserRole;
 import com.mariuszilinskas.vsp.userservice.enums.UserStatus;
@@ -9,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -23,6 +25,12 @@ import java.util.UUID;
 public class UserAdminController {
 
     private final UserAdminService userAdminService;
+
+    @GetMapping("/users")
+    public ResponseEntity<List<UserResponse>> getUsers(){
+        List<UserResponse> response = userAdminService.getUsers();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 
     @PostMapping("/{userId}/role/{userRole}")
     public ResponseEntity<Void> grantUserRole(

@@ -1,11 +1,14 @@
 package com.mariuszilinskas.vsp.userservice.service;
 
+import com.mariuszilinskas.vsp.userservice.dto.UserResponse;
 import com.mariuszilinskas.vsp.userservice.enums.UserAuthority;
 import com.mariuszilinskas.vsp.userservice.enums.UserRole;
 import com.mariuszilinskas.vsp.userservice.enums.UserStatus;
 import com.mariuszilinskas.vsp.userservice.exception.ResourceNotFoundException;
 import com.mariuszilinskas.vsp.userservice.model.User;
 import com.mariuszilinskas.vsp.userservice.repository.UserRepository;
+import com.mariuszilinskas.vsp.userservice.util.UserUtils;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +32,16 @@ public class UserAdminServiceImp implements UserAdminService {
     private final UserRepository userRepository;
 
     @Override
+    public List<UserResponse> getUsers() {
+        logger.info("Getting all platform Users");
+        List<User> users = userRepository.findAll();
+        return users.stream()
+                .map(UserUtils::mapToUserResponse)
+                .toList();
+    }
+
+    @Override
+    @Transactional
     public void grantUserRole(UUID userId, UserRole userRole) {
         logger.info("Granting '{}' Role for User [id: '{}']", userRole, userId);
 
@@ -43,6 +56,7 @@ public class UserAdminServiceImp implements UserAdminService {
     }
 
     @Override
+    @Transactional
     public void removeUserRole(UUID userId, UserRole userRole) {
         logger.info("Removing '{}' Role for User [id: '{}']", userRole, userId);
 
@@ -57,6 +71,7 @@ public class UserAdminServiceImp implements UserAdminService {
     }
 
     @Override
+    @Transactional
     public void grantUserAuthority(UUID userId, UserAuthority authority) {
         logger.info("Granting '{}' Authority for User [id: '{}']", authority, userId);
 
@@ -71,6 +86,7 @@ public class UserAdminServiceImp implements UserAdminService {
     }
 
     @Override
+    @Transactional
     public void removeUserAuthority(UUID userId, UserAuthority authority) {
         logger.info("Removing '{}' Authority for User [id: '{}']", authority, userId);
 
@@ -85,6 +101,7 @@ public class UserAdminServiceImp implements UserAdminService {
     }
 
     @Override
+    @Transactional
     public void updateUserStatus(UUID userId, UserStatus status) {
         logger.info("Setting status '{}' for User [id: '{}']", status, userId);
         User user = findUserById(userId);
