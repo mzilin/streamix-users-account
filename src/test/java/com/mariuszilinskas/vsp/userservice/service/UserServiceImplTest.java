@@ -46,7 +46,6 @@ public class UserServiceImplTest {
     private final FeignException feignException = TestUtils.createFeignException();
     private final UUID userId = UUID.randomUUID();
     private final User user = new User();
-    private final User user2 = new User();
 
     // ------------------------------------
 
@@ -57,15 +56,6 @@ public class UserServiceImplTest {
         user.setLastName("Doe");
         user.setEmail("john@example.com");
         user.setCountry("United Kingdom");
-        user.setStatus(UserStatus.ACTIVE);
-        user.setRoles(List.of(UserRole.USER));
-        user.setAuthorities(List.of());
-
-        user2.setId(UUID.randomUUID());
-        user2.setFirstName("Jane");
-        user2.setLastName("Doe");
-        user2.setEmail("jane@example.com");
-        user2.setCountry("United Kingdom");
         user.setStatus(UserStatus.ACTIVE);
         user.setRoles(List.of(UserRole.USER));
         user.setAuthorities(List.of());
@@ -85,7 +75,6 @@ public class UserServiceImplTest {
     void testCreateUser_Success() {
         // Arrange
         ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
-        user.setStatus(UserStatus.PENDING);
 
         when(userRepository.existsByEmail(createUserRequest.email()))
                 .thenReturn(false);
@@ -108,6 +97,7 @@ public class UserServiceImplTest {
         assertEquals(createUserRequest.lastName(), savedUser.getLastName());
         assertEquals(createUserRequest.email(), savedUser.getEmail());
         assertEquals(createUserRequest.country(), savedUser.getCountry());
+        assertEquals(UserStatus.PENDING, savedUser.getStatus());
         assertFalse(savedUser.isEmailVerified());
     }
 
