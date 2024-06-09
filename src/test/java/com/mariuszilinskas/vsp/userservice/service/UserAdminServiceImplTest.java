@@ -1,5 +1,6 @@
 package com.mariuszilinskas.vsp.userservice.service;
 
+import com.mariuszilinskas.vsp.userservice.dto.UserResponse;
 import com.mariuszilinskas.vsp.userservice.enums.UserAuthority;
 import com.mariuszilinskas.vsp.userservice.enums.UserRole;
 import com.mariuszilinskas.vsp.userservice.enums.UserStatus;
@@ -31,7 +32,9 @@ public class UserAdminServiceImplTest {
     UserAdminServiceImp userAdminService;
 
     private final UUID userId = UUID.randomUUID();
+    private final UUID user2Id = UUID.randomUUID();
     private final User user = new User();
+    private final User user2 = new User();
 
     // ------------------------------------
 
@@ -45,6 +48,38 @@ public class UserAdminServiceImplTest {
         user.setStatus(UserStatus.ACTIVE);
         user.setRoles(List.of(UserRole.USER));
         user.setAuthorities(List.of());
+
+        user2.setId(user2Id);
+        user2.setFirstName("Jane");
+        user2.setLastName("Doe");
+        user2.setEmail("jane@example.com");
+        user2.setCountry("United Kingdom");
+        user2.setStatus(UserStatus.ACTIVE);
+        user2.setRoles(List.of(UserRole.USER));
+        user2.setAuthorities(List.of());
+    }
+
+    // ------------------------------------
+
+    @Test
+    void testGetUsers() {
+        // Arrange
+        List<User> users = List.of(user, user2);
+
+        when(userRepository.findAll()).thenReturn(users);
+
+        // Act
+        List<UserResponse> userResponses = userAdminService.getUsers();
+
+        // Assert
+        assertNotNull(userResponses);
+        assertEquals(2, userResponses.size());
+        assertEquals(user.getId(), userResponses.get(0).id());
+        assertEquals(user.getFirstName(), userResponses.get(0).firstName());
+        assertEquals(user2.getId(), userResponses.get(1).id());
+        assertEquals(user2.getFirstName(), userResponses.get(1).firstName());
+
+        verify(userRepository, times(1)).findAll();
     }
 
     // ------------------------------------
