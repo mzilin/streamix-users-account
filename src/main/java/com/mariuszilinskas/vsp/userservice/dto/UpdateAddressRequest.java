@@ -2,10 +2,11 @@ package com.mariuszilinskas.vsp.userservice.dto;
 
 import com.mariuszilinskas.vsp.userservice.enums.AddressType;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public record UpdateAddressRequest(
 
-        @NotBlank(message = "addressType cannot be blank")
+        @NotNull(message = "addressType cannot be null")
         AddressType addressType,
 
         @NotBlank(message = "street1 cannot be blank")
