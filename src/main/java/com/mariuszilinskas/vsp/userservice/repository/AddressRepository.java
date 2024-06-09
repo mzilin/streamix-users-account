@@ -1,5 +1,6 @@
 package com.mariuszilinskas.vsp.userservice.repository;
 
+import com.mariuszilinskas.vsp.userservice.enums.AddressType;
 import com.mariuszilinskas.vsp.userservice.model.Address;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -16,8 +17,14 @@ import java.util.UUID;
 @Repository
 public interface AddressRepository extends JpaRepository<Address, UUID> {
 
-    Optional<Address> findByUserId(UUID userId);
+    boolean existsByUserIdAndAddressType(UUID userId, AddressType addressType);
+
+    boolean existsByUserIdAndAddressTypeAndIdNot(UUID userId, AddressType addressType, UUID addressId);
+
+    Optional<Address> findByIdAndUserId(UUID addressId, UUID userId);
 
     List<Address> findAllByUserId(UUID userId);
+
+    void deleteAllByUserId(UUID userId);
 
 }
