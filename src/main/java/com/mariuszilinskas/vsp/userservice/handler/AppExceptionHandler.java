@@ -54,8 +54,13 @@ public class AppExceptionHandler {
 
     // --------------------- Specific -----------------------------
 
+    @ExceptionHandler(AddressTypeExistsException.class)
+    public ResponseEntity<ErrorResponse> handleAddressTypeExistsException(AddressTypeExistsException ex) {
+        return buildErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(EmailExistsException.class)
-    public ResponseEntity<ErrorResponse> handleUserExistsException(EmailExistsException ex) {
+    public ResponseEntity<ErrorResponse> handleEmailExistsException(EmailExistsException ex) {
         return buildErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
