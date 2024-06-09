@@ -10,6 +10,7 @@ import com.mariuszilinskas.vsp.userservice.exception.ResourceNotFoundException;
 import com.mariuszilinskas.vsp.userservice.exception.UserRegistrationException;
 import com.mariuszilinskas.vsp.userservice.model.User;
 import com.mariuszilinskas.vsp.userservice.repository.UserRepository;
+import com.mariuszilinskas.vsp.userservice.util.UserUtils;
 import feign.FeignException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +46,7 @@ public class UserServiceImpl implements UserService {
         User createdUser = userRepository.save(newUser);
         createUserCredentials(createdUser.getId(), request.password());
 
-        return mapToUserResponse(createdUser);
+        return UserUtils.mapToUserResponse(createdUser);
     }
 
     private User populateNewUserWithRequestData(CreateUserRequest request) {
@@ -78,7 +79,7 @@ public class UserServiceImpl implements UserService {
     public UserResponse getUser(UUID userId) {
         logger.info("Getting User [id: '{}'", userId);
         User user = findUserById(userId);
-        return mapToUserResponse(user);
+        return UserUtils.mapToUserResponse(user);
     }
 
     @Override
@@ -86,7 +87,7 @@ public class UserServiceImpl implements UserService {
         logger.info("Updating User [id: '{}']", userId);
         User user = findUserById(userId);
         applyUserUpdates(user, request);
-        return mapToUserResponse(user);
+        return UserUtils.mapToUserResponse(user);
     }
 
     private void applyUserUpdates(User user, UpdateUserRequest request) {
@@ -94,22 +95,6 @@ public class UserServiceImpl implements UserService {
         user.setLastName(request.lastName());
         user.setCountry(request.country());
         userRepository.save(user);
-    }
-
-    private UserResponse mapToUserResponse(User user) {
-        return new UserResponse(
-                user.getId(),
-                user.getFirstName(),
-                user.getLastName(),
-                user.getEmail(),
-                user.getCountry(),
-                user.isEmailVerified(),
-                user.getStatus().name(),
-                user.getRoles(),
-                user.getAuthorities(),
-                user.getCreatedAt(),
-                user.getLastActive()
-        );
     }
 
     @Override
