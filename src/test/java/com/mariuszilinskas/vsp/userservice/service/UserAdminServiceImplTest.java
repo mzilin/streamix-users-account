@@ -68,15 +68,15 @@ public class UserAdminServiceImplTest {
         when(userRepository.findAll()).thenReturn(users);
 
         // Act
-        List<UserResponse> userResponses = userAdminService.getUsers();
+        List<UserResponse> response = userAdminService.getUsers();
 
         // Assert
-        assertNotNull(userResponses);
-        assertEquals(2, userResponses.size());
-        assertEquals(user.getId(), userResponses.get(0).id());
-        assertEquals(user.getFirstName(), userResponses.get(0).firstName());
-        assertEquals(user2.getId(), userResponses.get(1).id());
-        assertEquals(user2.getFirstName(), userResponses.get(1).firstName());
+        assertNotNull(response);
+        assertEquals(2, response.size());
+        assertEquals(user.getId(), response.get(0).id());
+        assertEquals(user.getFirstName(), response.get(0).firstName());
+        assertEquals(user2.getId(), response.get(1).id());
+        assertEquals(user2.getFirstName(), response.get(1).firstName());
 
         verify(userRepository, times(1)).findAll();
     }
