@@ -8,7 +8,10 @@ public record UpdateUserRequest(
         String firstName,
 
         @NotBlank(message = "lastName cannot be blank")
-        String lastName
+        String lastName,
+
+        @NotBlank(message = "country cannot be blank")
+        String country
 
 ) {
         public UpdateUserRequest {

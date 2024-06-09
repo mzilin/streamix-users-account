@@ -186,7 +186,7 @@ public class UserServiceImplTest {
     void testUpdateUser_Success() {
         // Arrange
         ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
-        UpdateUserRequest request = new UpdateUserRequest("UpdatedFirstName", "UpdatedLastName");
+        UpdateUserRequest request = new UpdateUserRequest("UpdatedFirstName", "UpdatedLastName", "UpdatedCountry");
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(userRepository.save(captor.capture())).thenReturn(user);
@@ -204,12 +204,13 @@ public class UserServiceImplTest {
         User savedUser = captor.getValue();
         assertEquals(request.firstName(), savedUser.getFirstName());
         assertEquals(request.lastName(), savedUser.getLastName());
+        assertEquals(request.country(), savedUser.getCountry());
     }
 
     @Test
     void testUpdateUser_NonExistentUser() {
         // Arrange
-        UpdateUserRequest request = new UpdateUserRequest("UpdatedFirstName", "UpdatedLastName");
+        UpdateUserRequest request = new UpdateUserRequest("UpdatedFirstName", "UpdatedLastName", "UpdatedCountry");
 
         UUID nonExistentId = UUID.randomUUID();
         when(userRepository.findById(nonExistentId)).thenReturn(Optional.empty());

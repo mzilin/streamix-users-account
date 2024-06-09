@@ -91,6 +91,7 @@ public class UserServiceImpl implements UserService {
     private void applyUserUpdates(User user, UpdateUserRequest request) {
         user.setFirstName(request.firstName());
         user.setLastName(request.lastName());
+        user.setCountry(request.country());
         userRepository.save(user);
     }
 
