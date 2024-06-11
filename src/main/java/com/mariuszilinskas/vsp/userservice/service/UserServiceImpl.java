@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService {
 
         // TODO: RABBIT_MQ create default profiles & avatars + UPDATE TESTS
 
-        return UserUtils.mapToUserResponse(newUser);
+        return mapToUserResponse(newUser);
     }
 
     private User populateNewUserWithRequestData(CreateUserRequest request) {
@@ -77,7 +77,7 @@ public class UserServiceImpl implements UserService {
     public UserResponse getUser(UUID userId) {
         logger.info("Getting User [id: '{}'", userId);
         User user = findUserById(userId);
-        return UserUtils.mapToUserResponse(user);
+        return mapToUserResponse(user);
     }
 
     @Override
@@ -85,7 +85,7 @@ public class UserServiceImpl implements UserService {
         logger.info("Updating User [id: '{}']", userId);
         User user = findUserById(userId);
         applyUserUpdates(user, request);
-        return UserUtils.mapToUserResponse(user);
+        return mapToUserResponse(user);
     }
 
     private void applyUserUpdates(User user, UpdateUserRequest request) {
@@ -93,6 +93,17 @@ public class UserServiceImpl implements UserService {
         user.setLastName(request.lastName());
         user.setCountry(request.country());
         userRepository.save(user);
+    }
+
+    private static UserResponse mapToUserResponse(User user) {
+        return new UserResponse(
+                user.getId(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getEmail(),
+                user.getCountry(),
+                user.getStatus().name()
+        );
     }
 
     @Override
