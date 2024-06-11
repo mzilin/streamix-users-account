@@ -1,6 +1,6 @@
 package com.mariuszilinskas.vsp.userservice.controller;
 
-import com.mariuszilinskas.vsp.userservice.dto.UserResponse;
+import com.mariuszilinskas.vsp.userservice.dto.UserAdminResponse;
 import com.mariuszilinskas.vsp.userservice.enums.UserAuthority;
 import com.mariuszilinskas.vsp.userservice.enums.UserRole;
 import com.mariuszilinskas.vsp.userservice.enums.UserStatus;
@@ -27,8 +27,8 @@ public class UserAdminController {
     private final UserAdminService userAdminService;
 
     @GetMapping("/users")
-    public ResponseEntity<List<UserResponse>> getUsers(){
-        List<UserResponse> response = userAdminService.getUsers();
+    public ResponseEntity<List<UserAdminResponse>> getUsers(){
+        List<UserAdminResponse> response = userAdminService.getUsers();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

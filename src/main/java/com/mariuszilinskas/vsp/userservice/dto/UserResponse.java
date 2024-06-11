@@ -1,10 +1,5 @@
 package com.mariuszilinskas.vsp.userservice.dto;
 
-import com.mariuszilinskas.vsp.userservice.enums.UserAuthority;
-import com.mariuszilinskas.vsp.userservice.enums.UserRole;
-
-import java.time.ZonedDateTime;
-import java.util.List;
 import java.util.UUID;
 
 public record UserResponse(
@@ -13,10 +8,5 @@ public record UserResponse(
         String lastName,
         String email,
         String country,
-        boolean isEmailVerified,
-        String status,
-        List<UserRole> roles,
-        List<UserAuthority> authorities,
-        ZonedDateTime createdAt,
-        ZonedDateTime lastActive
+        String status
 ) {}

@@ -1,6 +1,6 @@
 package com.mariuszilinskas.vsp.userservice.service;
 
-import com.mariuszilinskas.vsp.userservice.dto.UserResponse;
+import com.mariuszilinskas.vsp.userservice.dto.UserAdminResponse;
 import com.mariuszilinskas.vsp.userservice.enums.UserAuthority;
 import com.mariuszilinskas.vsp.userservice.enums.UserRole;
 import com.mariuszilinskas.vsp.userservice.enums.UserStatus;
@@ -68,7 +68,7 @@ public class UserAdminServiceImplTest {
         when(userRepository.findAll()).thenReturn(users);
 
         // Act
-        List<UserResponse> response = userAdminService.getUsers();
+        List<UserAdminResponse> response = userAdminService.getUsers();
 
         // Assert
         assertNotNull(response);

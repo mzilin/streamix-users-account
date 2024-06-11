@@ -1,13 +1,12 @@
 package com.mariuszilinskas.vsp.userservice.service;
 
-import com.mariuszilinskas.vsp.userservice.dto.UserResponse;
+import com.mariuszilinskas.vsp.userservice.dto.UserAdminResponse;
 import com.mariuszilinskas.vsp.userservice.enums.UserAuthority;
 import com.mariuszilinskas.vsp.userservice.enums.UserRole;
 import com.mariuszilinskas.vsp.userservice.enums.UserStatus;
 import com.mariuszilinskas.vsp.userservice.exception.ResourceNotFoundException;
 import com.mariuszilinskas.vsp.userservice.model.User;
 import com.mariuszilinskas.vsp.userservice.repository.UserRepository;
-import com.mariuszilinskas.vsp.userservice.util.UserUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -32,12 +31,28 @@ public class UserAdminServiceImp implements UserAdminService {
     private final UserRepository userRepository;
 
     @Override
-    public List<UserResponse> getUsers() {
+    public List<UserAdminResponse> getUsers() {
         logger.info("Getting all platform Users");
         List<User> users = userRepository.findAll();
         return users.stream()
-                .map(UserUtils::mapToUserResponse)
+                .map(UserAdminServiceImp::mapToUserAdminResponse)
                 .toList();
+    }
+
+    private static UserAdminResponse mapToUserAdminResponse(User user) {
+        return new UserAdminResponse(
+                user.getId(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getEmail(),
+                user.getCountry(),
+                user.isEmailVerified(),
+                user.getStatus().name(),
+                user.getRoles(),
+                user.getAuthorities(),
+                user.getCreatedAt(),
+                user.getLastActive()
+        );
     }
 
     @Override

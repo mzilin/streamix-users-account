@@ -154,8 +154,6 @@ public class UserServiceImplTest {
         assertEquals(user.getLastName(), response.lastName());
         assertEquals(user.getEmail(), response.email());
         assertEquals(user.getStatus().name(), response.status());
-        assertThat(user.getRoles()).containsExactlyInAnyOrderElementsOf(response.roles());
-        assertThat(user.getAuthorities()).containsExactlyInAnyOrderElementsOf(response.authorities());
 
         verify(userRepository, times(1)).findById(userId);
     }
