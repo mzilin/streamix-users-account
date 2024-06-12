@@ -24,10 +24,10 @@ import static org.mockito.Mockito.*;
 public class AddressServiceImplTest {
 
     @Mock
-    AddressRepository addressRepository;
+    private AddressRepository addressRepository;
 
     @InjectMocks
-    AddressServiceImpl addressService;
+    private AddressServiceImpl addressService;
 
     private UpdateAddressRequest createRequest;
     private UpdateAddressRequest updateRequest;

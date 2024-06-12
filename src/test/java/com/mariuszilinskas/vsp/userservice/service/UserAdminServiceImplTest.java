@@ -26,10 +26,10 @@ import static org.mockito.Mockito.*;
 public class UserAdminServiceImplTest {
 
     @Mock
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
     @InjectMocks
-    UserAdminServiceImp userAdminService;
+    private UserAdminServiceImp userAdminService;
 
     private final UUID userId = UUID.randomUUID();
     private final User user = new User();

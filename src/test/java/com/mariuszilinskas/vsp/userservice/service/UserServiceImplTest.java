@@ -34,13 +34,13 @@ import static org.mockito.Mockito.*;
 public class UserServiceImplTest {
 
     @Mock
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
     @Mock
     private AuthFeignClient authFeignClient;
 
     @InjectMocks
-    UserServiceImpl userService;
+    private UserServiceImpl userService;
 
     private CreateUserRequest createUserRequest;
     private final FeignException feignException = TestUtils.createFeignException();
