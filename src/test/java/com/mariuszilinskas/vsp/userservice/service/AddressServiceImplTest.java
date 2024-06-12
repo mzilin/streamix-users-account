@@ -264,6 +264,9 @@ public class AddressServiceImplTest {
         // Assert
         verify(addressRepository, times(1)).findByIdAndUserId(addressId, userId);
         verify(addressRepository, times(1)).delete(address);
+
+        when(addressRepository.findById(addressId)).thenReturn(Optional.empty());
+        assertFalse(addressRepository.findById(addressId).isPresent());
     }
 
     @Test
