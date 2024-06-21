@@ -8,9 +8,9 @@ import com.mariuszilinskas.vsp.userservice.exception.EmailExistsException;
 import com.mariuszilinskas.vsp.userservice.exception.PasswordValidationException;
 import com.mariuszilinskas.vsp.userservice.exception.ResourceNotFoundException;
 import com.mariuszilinskas.vsp.userservice.exception.UserRegistrationException;
+import com.mariuszilinskas.vsp.userservice.producer.RabbitMQProducer;
 import com.mariuszilinskas.vsp.userservice.model.User;
 import com.mariuszilinskas.vsp.userservice.repository.UserRepository;
-import com.mariuszilinskas.vsp.userservice.util.UserUtils;
 import feign.FeignException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +35,7 @@ public class UserServiceImpl implements UserService {
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
     private final AuthFeignClient authFeignClient;
     private final UserRepository userRepository;
+    private final RabbitMQProducer rabbitMQProducer;
 
     @Override
     @Transactional
@@ -43,9 +44,11 @@ public class UserServiceImpl implements UserService {
 
         checkEmailExists(request.email());
         User newUser = populateNewUserWithRequestData(request);
-        createUserCredentials(newUser.getId(), request.password());
+        var credentialsRequest = new CredentialsRequest(newUser.getId(), request.password());
+        createUserCredentials(credentialsRequest);
 
-        // TODO: RABBIT_MQ create default profiles & avatars + UPDATE TESTS
+        var rabbitRequest = new CreateUserDefaultProfileRequest(newUser.getId(), newUser.getFirstName());
+        rabbitMQProducer.sendCreateUserDefaultProfileMessage(rabbitRequest);
 
         return mapToUserResponse(newUser);
     }
@@ -61,11 +64,11 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user);
     }
 
-    private void createUserCredentials(UUID userId, String password) {
+    private void createUserCredentials(CredentialsRequest request) {
         try {
-            CredentialsRequest request = new CredentialsRequest(userId, password);
             authFeignClient.createPasswordAndSetPasscode(request);
         } catch (FeignException ex) {
+            UUID userId = request.userId();
             logger.error("Feign Exception when creating Password and Passcode for User [id: {}]: Status {}, Body {}",
                     userId, ex.status(), ex.contentUTF8());
             userRepository.deleteById(userId);  // Rollback user creation
@@ -111,23 +114,15 @@ public class UserServiceImpl implements UserService {
         logger.info("Updating User Email [id: '{}'", userId);
 
         User user = findUserById(userId);
-        verifyPassword(userId, request.password());
+        var passwordRequest = new VerifyPasswordRequest(userId, request.password());
+
+        verifyPassword(passwordRequest);
         checkEmailExists(request.email());
         applyEmailUpdate(user, request);
 
-        // TODO: RabbitMQ - send request to create passcode and send verification email
+        rabbitMQProducer.sendResetPasscodeMessage(userId);
 
         return new UpdateEmailResponse(userId, user.getEmail(), user.isEmailVerified());
-    }
-
-    private void verifyPassword(UUID userId, String password) {
-        try {
-            CredentialsRequest request = new CredentialsRequest(userId, password);
-            authFeignClient.verifyPassword(request);
-        } catch (FeignException ex) {
-            logger.error("Feign Exception when verifying password: Status {}, Body {}", ex.status(), ex.contentUTF8());
-            throw new PasswordValidationException();
-        }
     }
 
     private void checkEmailExists(String email) {
@@ -161,11 +156,21 @@ public class UserServiceImpl implements UserService {
         return updateLastActiveAndMapToAuthResponse(user);
     }
 
+    private User findUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException(User.class, "email", email));
+    }
+
     @Override
     public AuthDetailsResponse getUserAuthDetailsByUserId(UUID userId) {
         logger.info("Getting Auth Details for User [id: '{}'", userId);
         User user = findUserById(userId);
         return updateLastActiveAndMapToAuthResponse(user);
+    }
+
+    private User findUserById(UUID userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException(User.class, "id", userId));
     }
 
     private AuthDetailsResponse updateLastActiveAndMapToAuthResponse(User user) {
@@ -183,20 +188,23 @@ public class UserServiceImpl implements UserService {
         );
     }
 
-    private User findUserByEmail(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException(User.class, "email", email));
-    }
-
-    private User findUserById(UUID userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException(User.class, "id", userId));
-    }
-
     @Override
     @Transactional
     public void deleteUser(UUID userId, DeleteUserRequest request) {
-        // TODO: RabbitMQ to all services for user data deletion
+        logger.info("Deleting User [userId: '{}'], and its data", userId);
+        var passwordRequest = new VerifyPasswordRequest(userId, request.password());
+        verifyPassword(passwordRequest);
+        userRepository.deleteById(userId);
+        rabbitMQProducer.sendDeleteUserDataMessage(userId);
+    }
+
+    private void verifyPassword(VerifyPasswordRequest request) {
+        try {
+            authFeignClient.verifyPassword(request);
+        } catch (FeignException ex) {
+            logger.error("Feign Exception when verifying password: Status {}, Body {}", ex.status(), ex.contentUTF8());
+            throw new PasswordValidationException();
+        }
     }
 
 }
