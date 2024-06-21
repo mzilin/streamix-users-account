@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.UUID;
 
-public record CreateDefaultUserProfileRequest(
+public record CreateUserDefaultProfileRequest(
 
         @NotNull(message = "userId cannot be null")
         UUID userId,
