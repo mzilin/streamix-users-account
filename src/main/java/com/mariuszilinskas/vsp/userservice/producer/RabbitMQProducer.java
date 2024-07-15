@@ -24,7 +24,7 @@ public class RabbitMQProducer {
     private String profileSetupRoutingKey;
 
     @Value("${rabbitmq.routing-keys.reset-passcode}")
-    private String createPasscodeRoutingKey;
+    private String resetPasscodeRoutingKey;
 
     @Value("${rabbitmq.routing-keys.delete-user-data}")
     private String deleteUserDataRoutingKey;
@@ -36,7 +36,7 @@ public class RabbitMQProducer {
 
     public void sendResetPasscodeMessage(UUID userId) {
         logger.info("Sending message to create user passcode: {}", userId);
-        rabbitTemplate.convertAndSend(exchange, createPasscodeRoutingKey, userId);
+        rabbitTemplate.convertAndSend(exchange, resetPasscodeRoutingKey, userId);
     }
 
     public void sendDeleteUserDataMessage(UUID userId) {
