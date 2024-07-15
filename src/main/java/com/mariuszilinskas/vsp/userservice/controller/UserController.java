@@ -79,4 +79,13 @@ public class UserController {
         return new ResponseEntity<>(authDetails, HttpStatus.OK);
     }
 
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<Void> deleteUser(
+            @PathVariable UUID userId,
+            @Valid @RequestBody DeleteUserRequest request
+    ) {
+        userService.deleteUser(userId, request);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
 }
