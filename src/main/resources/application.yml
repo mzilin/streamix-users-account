@@ -47,9 +47,12 @@ eureka:
 # RabbitMQ settings
 rabbitmq:
   exchange: ${RMQ_EXCHANGE}
+  queues:
+    verify-account: ${RMQ_VERIFY_ACCOUNT_Q}
   routing-keys:
     create-credentials: ${RMQ_CREATE_CREDENTIALS_RK}
     profile-setup: ${RMQ_PROFILE_SETUP_RK}
+    verify-account: ${RMQ_VERIFY_ACCOUNT_RK}
     reset-passcode: ${RMQ_RESET_PASSCODE_RK}
     delete-user-data: ${RMQ_DELETE_USER_DATA_RK}
 
