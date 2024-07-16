@@ -7,7 +7,6 @@ import com.mariuszilinskas.vsp.userservice.enums.UserStatus;
 import com.mariuszilinskas.vsp.userservice.exception.EmailExistsException;
 import com.mariuszilinskas.vsp.userservice.exception.PasswordValidationException;
 import com.mariuszilinskas.vsp.userservice.exception.ResourceNotFoundException;
-import com.mariuszilinskas.vsp.userservice.exception.UserRegistrationException;
 import com.mariuszilinskas.vsp.userservice.model.User;
 import com.mariuszilinskas.vsp.userservice.producer.RabbitMQProducer;
 import com.mariuszilinskas.vsp.userservice.repository.UserRepository;
@@ -79,13 +78,14 @@ public class UserServiceImplTest {
     void testCreateUser_Success() {
         // Arrange
         ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
-        var credentialsRequest = new CredentialsRequest(userId, createUserRequest.password());
+        var credentialsRequest = new CredentialsRequest(
+                userId, createUserRequest.firstName(), createUserRequest.email(), createUserRequest.password());
         var profileRequest = new CreateUserDefaultProfileRequest(userId, user.getFirstName());
 
         when(userRepository.existsByEmail(createUserRequest.email()))
                 .thenReturn(false);
         when(userRepository.save(captor.capture())).thenReturn(user);
-        when(authFeignClient.createPasswordAndSetPasscode(credentialsRequest)).thenReturn(null);
+        doNothing().when(rabbitMQProducer).sendCreateCredentialsMessage(credentialsRequest);
         doNothing().when(rabbitMQProducer).sendCreateUserDefaultProfileMessage(profileRequest);
 
         // Act
@@ -97,7 +97,7 @@ public class UserServiceImplTest {
 
         verify(userRepository, times(1)).existsByEmail(createUserRequest.email());
         verify(userRepository, times(1)).save(captor.capture());
-        verify(authFeignClient, times(1)).createPasswordAndSetPasscode(credentialsRequest);
+        verify(rabbitMQProducer, times(1)).sendCreateCredentialsMessage(credentialsRequest);
         verify(rabbitMQProducer, times(1)).sendCreateUserDefaultProfileMessage(profileRequest);
 
         User savedUser = captor.getValue();
@@ -120,29 +120,8 @@ public class UserServiceImplTest {
         // Assert
         verify(userRepository, times(1)).existsByEmail(createUserRequest.email());
         verify(userRepository, never()).save(any(User.class));
-        verify(authFeignClient, never()).createPasswordAndSetPasscode(any(CredentialsRequest.class));
-    }
-
-    @Test
-    void testCreateUser_FailsToCreateUserCredentials() {
-        // Arrange
-        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
-        user.setStatus(UserStatus.PENDING);
-
-        when(userRepository.existsByEmail(createUserRequest.email()))
-                .thenReturn(false);
-        when(userRepository.save(captor.capture())).thenReturn(user);
-        doThrow(feignException).when(authFeignClient).createPasswordAndSetPasscode(any(CredentialsRequest.class));
-        doNothing().when(userRepository).deleteById(userId);
-
-        // Act & Assert
-        assertThrows(UserRegistrationException.class, () -> userService.createUser(createUserRequest));
-
-        // Assert
-        verify(userRepository, times(1)).existsByEmail(createUserRequest.email());
-        verify(userRepository, times(1)).save(captor.capture());
-        verify(authFeignClient, times(1)).createPasswordAndSetPasscode(any(CredentialsRequest.class));
-        verify(userRepository, times(1)).deleteById(userId);
+        verify(rabbitMQProducer, never()).sendCreateCredentialsMessage(any(CredentialsRequest.class));
+        verify(rabbitMQProducer, never()).sendCreateUserDefaultProfileMessage(any(CreateUserDefaultProfileRequest.class));
     }
 
     // ------------------------------------
