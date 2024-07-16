@@ -1,6 +1,7 @@
 package com.mariuszilinskas.vsp.userservice.producer;
 
 import com.mariuszilinskas.vsp.userservice.dto.CreateUserDefaultProfileRequest;
+import com.mariuszilinskas.vsp.userservice.dto.CredentialsRequest;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,9 @@ public class RabbitMQProducer {
     @Value("${rabbitmq.exchange}")
     private String exchange;
 
+    @Value("${rabbitmq.routing-keys.create-credentials}")
+    private String createCredentialsRoutingKey;
+
     @Value("${rabbitmq.routing-keys.profile-setup}")
     private String profileSetupRoutingKey;
 
@@ -28,6 +32,11 @@ public class RabbitMQProducer {
 
     @Value("${rabbitmq.routing-keys.delete-user-data}")
     private String deleteUserDataRoutingKey;
+
+    public void sendCreateCredentialsMessage(CredentialsRequest request) {
+        logger.info("Sending message to create user credentials: {}", request);
+        rabbitTemplate.convertAndSend(exchange, createCredentialsRoutingKey, request);
+    }
 
     public void sendCreateUserDefaultProfileMessage(CreateUserDefaultProfileRequest request) {
         logger.info("Sending message to create default user profile: {}", request);
