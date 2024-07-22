@@ -7,7 +7,6 @@ import com.mariuszilinskas.vsp.userservice.enums.UserStatus;
 import com.mariuszilinskas.vsp.userservice.exception.EmailExistsException;
 import com.mariuszilinskas.vsp.userservice.exception.PasswordValidationException;
 import com.mariuszilinskas.vsp.userservice.exception.ResourceNotFoundException;
-import com.mariuszilinskas.vsp.userservice.exception.UserRegistrationException;
 import com.mariuszilinskas.vsp.userservice.producer.RabbitMQProducer;
 import com.mariuszilinskas.vsp.userservice.model.User;
 import com.mariuszilinskas.vsp.userservice.repository.UserRepository;
@@ -44,11 +43,12 @@ public class UserServiceImpl implements UserService {
 
         checkEmailExists(request.email());
         User newUser = populateNewUserWithRequestData(request);
-        var credentialsRequest = new CredentialsRequest(newUser.getId(), request.password());
-        createUserCredentials(credentialsRequest);
 
-        var rabbitRequest = new CreateUserDefaultProfileRequest(newUser.getId(), newUser.getFirstName());
-        rabbitMQProducer.sendCreateUserDefaultProfileMessage(rabbitRequest);
+        var credentialsRequest = new CredentialsRequest(newUser.getId(), request.firstName(), request.email(), request.password());
+        rabbitMQProducer.sendCreateCredentialsMessage(credentialsRequest);
+
+        var profileRequest = new CreateUserDefaultProfileRequest(newUser.getId(), newUser.getFirstName());
+        rabbitMQProducer.sendCreateUserDefaultProfileMessage(profileRequest);
 
         return mapToUserResponse(newUser);
     }
@@ -62,18 +62,6 @@ public class UserServiceImpl implements UserService {
         user.setRoles(List.of(UserRole.USER));
         user.setStatus(UserStatus.PENDING);
         return userRepository.save(user);
-    }
-
-    private void createUserCredentials(CredentialsRequest request) {
-        try {
-            authFeignClient.createPasswordAndSetPasscode(request);
-        } catch (FeignException ex) {
-            UUID userId = request.userId();
-            logger.error("Feign Exception when creating Password and Passcode for User [id: {}]: Status {}, Body {}",
-                    userId, ex.status(), ex.contentUTF8());
-            userRepository.deleteById(userId);  // Rollback user creation
-            throw new UserRegistrationException(userId);
-        }
     }
 
     @Override

@@ -15,9 +15,27 @@ public class RabbitMQConfig {
     @Value("${rabbitmq.exchange}")
     private String exchange;
 
+    @Value("${rabbitmq.queues.verify-account}")
+    private String verifyAccountQueue;
+
+    @Value("${rabbitmq.routing-keys.verify-account}")
+    private String verifyAccountRoutingKey;
+
     @Bean
     public DirectExchange exchange() {
         return new DirectExchange(exchange);
+    }
+
+    @Bean
+    public Queue verifyAccountQueue() {
+        return new Queue(verifyAccountQueue, true);
+    }
+
+    @Bean
+    public Binding verifyAccountBinding() {
+        return BindingBuilder.bind(verifyAccountQueue())
+                .to(exchange())
+                .with(verifyAccountRoutingKey);
     }
 
     @Bean

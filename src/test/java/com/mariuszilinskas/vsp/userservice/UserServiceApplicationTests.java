@@ -3,6 +3,7 @@ package com.mariuszilinskas.vsp.userservice;
 import com.mariuszilinskas.vsp.userservice.client.AuthFeignClient;
 import com.mariuszilinskas.vsp.userservice.config.FeignConfig;
 import com.mariuszilinskas.vsp.userservice.config.RabbitMQConfig;
+import com.mariuszilinskas.vsp.userservice.consumer.RabbitMQConsumer;
 import com.mariuszilinskas.vsp.userservice.controller.UserAdminController;
 import com.mariuszilinskas.vsp.userservice.controller.UserController;
 import com.mariuszilinskas.vsp.userservice.producer.RabbitMQProducer;
@@ -47,6 +48,9 @@ class UserServiceApplicationTests {
 
     @Autowired
     private RabbitMQProducer rabbitMQProducer;
+
+    @Autowired
+    private RabbitMQConsumer rabbitMQConsumer;
 
     @Test
     void contextLoads() {
@@ -95,6 +99,11 @@ class UserServiceApplicationTests {
     @Test
     void rabbitMQProducerBeanLoads() {
         assertNotNull(rabbitMQProducer, "RabbitMQ Producer should have been auto-wired by Spring Context");
+    }
+
+    @Test
+    void rabbitMQConsumerBeanLoads() {
+        assertNotNull(rabbitMQConsumer, "RabbitMQ Consumer should have been auto-wired by Spring Context");
     }
 
 }
