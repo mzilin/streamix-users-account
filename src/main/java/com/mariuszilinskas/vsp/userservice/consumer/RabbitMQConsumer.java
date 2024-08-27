@@ -16,7 +16,6 @@ public class RabbitMQConsumer {
     private static final Logger logger = LoggerFactory.getLogger(RabbitMQConsumer.class);
     private final UserService userService;
 
-
     @RabbitListener(queues = "${rabbitmq.queues.verify-account}")
     public void consumeVerifyAccountMessage(UUID userId) {
         logger.info("Received request to verify account for User [userId: {}]", userId);
