@@ -1,7 +1,7 @@
 package com.mariuszilinskas.vsp.users.account.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.mariuszilinskas.vsp.users.account.util.UserUtils;
+import com.mariuszilinskas.vsp.users.account.util.AccountUtils;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,7 +17,7 @@ import java.util.Map;
 @Setter
 public class FieldErrorResponse {
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = UserUtils.TIMESTAMP_FORMAT)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = AccountUtils.TIMESTAMP_FORMAT)
     private ZonedDateTime timestamp;
     private final int status;
     private final String error;

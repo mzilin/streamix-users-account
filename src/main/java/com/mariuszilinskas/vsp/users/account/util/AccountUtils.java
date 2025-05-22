@@ -1,8 +1,8 @@
 package com.mariuszilinskas.vsp.users.account.util;
 
-public abstract class UserUtils {
+public abstract class AccountUtils {
 
-    private UserUtils() {
+    private AccountUtils() {
         // Private constructor to prevent instantiation
     }
 
