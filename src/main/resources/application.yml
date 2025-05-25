@@ -20,41 +20,41 @@ spring:
       - optional:configserver:discovery://config-server
       - optional:file:./env.properties
   datasource:
-    url: ${DB_URL:jdbc:h2:mem:testdb}
-    driverClassName: ${DB_DRIVER_CLASS:org.h2.Driver}
-    username: ${DB_USERNAME:sa}
-    password: ${DB_PASSWORD:}
+    url: ${DB_URL}
+    driverClassName: ${DB_DRIVER_CLASS}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
   jpa:
-    database-platform: ${DB_DIALECT:org.hibernate.dialect.H2Dialect}
+    database-platform: ${DB_DIALECT}
     hibernate:
       ddl-auto: update
   rabbitmq:
-    host: ${RMQ_HOST:localhost}
-    port: ${RMQ_PORT:5672}
-    username: ${RMQ_USERNAME:guest}
-    password: ${RMQ_PASSWORD:guest}
+    host: ${RMQ_HOST}
+    port: ${RMQ_PORT}
+    username: ${RMQ_USERNAME}
+    password: ${RMQ_PASSWORD}
 
 # Eureka configuration
 eureka:
   client:
-    fetchRegistry: ${EUREKA_DISCOVERY_ENABLED:false}
-    registerWithEureka: ${EUREKA_DISCOVERY_ENABLED:false}
+    fetchRegistry: true
+    registerWithEureka: true
     serviceUrl:
-      defaultZone: ${EUREKA_CLIENT_DEFAULT_ZONE:http://localhost:8761/eureka/}
+      defaultZone: ${EUREKA_CLIENT_DEFAULT_ZONE}
   instance:
     preferIpAddress: true
 
 # RabbitMQ settings
 rabbitmq:
-  exchange: ${RMQ_EXCHANGE:dummy-exchange}
+  exchange: ${RMQ_EXCHANGE}
   queues:
-    verify-account: ${RMQ_VERIFY_ACCOUNT_Q:dummy-queue}
+    verify-account: ${RMQ_VERIFY_ACCOUNT_Q}
   routing-keys:
-    create-credentials: ${RMQ_CREATE_CREDENTIALS_RK:dummy-key}
-    profile-setup: ${RMQ_PROFILE_SETUP_RK:dummy-key}
-    verify-account: ${RMQ_VERIFY_ACCOUNT_RK:dummy-key}
-    reset-passcode: ${RMQ_RESET_PASSCODE_RK:dummy-key}
-    delete-user-data: ${RMQ_DELETE_USER_DATA_RK:dummy-key}
+    create-credentials: ${RMQ_CREATE_CREDENTIALS_RK}
+    profile-setup: ${RMQ_PROFILE_SETUP_RK}
+    verify-account: ${RMQ_VERIFY_ACCOUNT_RK}
+    reset-passcode: ${RMQ_RESET_PASSCODE_RK}
+    delete-user-data: ${RMQ_DELETE_USER_DATA_RK}
 
 # Management properties
 management:
