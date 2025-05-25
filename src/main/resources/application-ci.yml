@@ -9,6 +9,23 @@ spring:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: update
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+# RabbitMQ settings for CI
+rabbitmq:
+  exchange: dummy-exchange
+  queues:
+    verify-account: dummy-queue
+  routing-keys:
+    create-credentials: dummy-key
+    profile-setup: dummy-key
+    verify-account: dummy-key
+    reset-passcode: dummy-key
+    delete-user-data: dummy-key
 
 # Eureka configuration for CI
 eureka:
