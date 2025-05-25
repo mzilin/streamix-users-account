@@ -6,7 +6,7 @@ server:
 info:
   app:
     environment: DEV
-    name: users-account
+    name: ${spring.application.name}
     description: Account Service - Local Instance
 
 # Spring application properties
