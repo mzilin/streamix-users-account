@@ -20,12 +20,12 @@ spring:
       - optional:configserver:discovery://config-server
       - optional:file:./env.properties
   datasource:
-    url: ${DB_URI:jdbc:h2:mem:testdb}
-    driverClassName: ${DB_DRIVER:org.h2.Driver}
+    url: ${DB_URL:jdbc:h2:mem:testdb}
+    driverClassName: ${DB_DRIVER_CLASS:org.h2.Driver}
     username: ${DB_USERNAME:sa}
     password: ${DB_PASSWORD:}
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    database-platform: ${DB_DIALECT:org.hibernate.dialect.H2Dialect}
     hibernate:
       ddl-auto: update
   rabbitmq:
@@ -46,7 +46,7 @@ eureka:
 
 # RabbitMQ settings
 rabbitmq:
-  exchange: ${RMQ_EXCHANGE:vsp}
+  exchange: ${RMQ_EXCHANGE:dummy-exchange}
   queues:
     verify-account: ${RMQ_VERIFY_ACCOUNT_Q:dummy-queue}
   routing-keys:
