@@ -6,13 +6,13 @@ server:
 info:
   app:
     environment: DEV
-    name: account-service
+    name: users-account
     description: Account Service - Local Instance
 
 # Spring application properties
 spring:
   application:
-    name: account-service
+    name: users-account
   profiles:
     active: dev
   config:
