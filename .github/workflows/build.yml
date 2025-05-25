@@ -21,4 +21,4 @@ jobs:
           cache: 'gradle'
 
       - name: Build with Gradle
-        run: ./gradlew build --no-daemon
+        run: SPRING_PROFILES_ACTIVE=test ./gradlew build --no-daemon
