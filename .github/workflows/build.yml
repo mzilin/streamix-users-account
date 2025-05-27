@@ -3,9 +3,23 @@ name: Build
 on:
   push:
     branches: [main, prod]
+    paths-ignore:
+      - 'iac/**'
+      - '**/*.md'
+      - '**/*.txt'
+      - 'docs/**'
+      - '.github/**'
+      - '**/*.yml'
 
   pull_request:
     branches: [main, prod]
+    paths-ignore:
+    - 'iac/**'
+    - '**/*.md'
+    - '**/*.txt'
+    - 'docs/**'
+    - '.github/**'
+    - '**/*.yml'
 
 jobs:
   build:
