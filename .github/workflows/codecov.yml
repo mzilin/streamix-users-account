@@ -7,7 +7,7 @@ on:
 jobs:
   upload-coverage:
     runs-on: ubuntu-latest
-    name: "Codecov"
+    name: "Upload Coverage Report"
 
     steps:
       - name: Checkout code
