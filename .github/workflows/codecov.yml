@@ -3,6 +3,13 @@ name: Codecov
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - 'iac/**'
+      - '**/*.md'
+      - '**/*.txt'
+      - 'docs/**'
+      - '.github/**'
+      - '**/*.yml'
 
 jobs:
   upload-coverage:
