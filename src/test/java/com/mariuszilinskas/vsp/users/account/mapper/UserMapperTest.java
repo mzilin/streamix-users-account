@@ -34,7 +34,7 @@ public class UserMapperTest {
     // ------------------------------------
 
     @Test
-    void shouldMapFromCreateRequest() {
+    void testMapFromCreateRequest_Success() {
         // Arrange
         var request = new CreateUserRequest(
                 user.getFirstName(),
@@ -57,7 +57,7 @@ public class UserMapperTest {
     }
 
     @Test
-    void shouldApplyUpdates() {
+    void testApplyUpdates_Success() {
         // Arrange
         String newFirstName = "Paul";
         String newLastName = "Stevens";
@@ -75,7 +75,7 @@ public class UserMapperTest {
     }
 
     @Test
-    void shouldMapToUserResponse() {
+    void testMapToUserResponse_Success() {
         // Act
         UserResponse response = UserMapper.mapToUserResponse(user);
 
@@ -89,7 +89,7 @@ public class UserMapperTest {
     }
 
     @Test
-    void shouldMapToUpdateEmailResponse() {
+    void testMapToUpdateEmailResponse_Success() {
         // Arrange
         user.setEmailVerified(true);
 
@@ -103,7 +103,7 @@ public class UserMapperTest {
     }
 
     @Test
-    void shouldMapToAuthDetailsResponse() {
+    void testMapToAuthDetailsResponse_Success() {
         // Act
         AuthDetailsResponse response = UserMapper.mapToAuthDetailsResponse(user);
 
@@ -115,12 +115,12 @@ public class UserMapperTest {
     }
 
     @Test
-    void shouldMapToCredentialsRequest() {
+    void testMapToCredentialsRequest_Success() {
         // Arrange
         String password = "Secret!123";
 
         // Act
-        CredentialsRequest request = UserMapper.toCredentialsRequest(user, password);
+        CredentialsRequest request = UserMapper.mapToCredentialsRequest(user, password);
 
         // Assert
         assertEquals(userId, request.userId());
@@ -130,9 +130,9 @@ public class UserMapperTest {
     }
 
     @Test
-    void shouldMapToDefaultProfileRequest() {
+    void testMapToDefaultProfileRequest_Success() {
         // Act
-        CreateUserDefaultProfileRequest profileRequest = UserMapper.toDefaultProfileRequest(user);
+        CreateUserDefaultProfileRequest profileRequest = UserMapper.mapToDefaultProfileRequest(user);
 
         // Assert
         assertEquals(userId, profileRequest.userId());

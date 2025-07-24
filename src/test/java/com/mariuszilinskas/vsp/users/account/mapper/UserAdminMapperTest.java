@@ -39,7 +39,7 @@ public class UserAdminMapperTest {
 
 
     @Test
-    void shouldMapToUserResponse() {
+    void testMapToUserAdminResponse_Success() {
         // Act
         UserAdminResponse response = UserAdminMapper.mapToUserAdminResponse(user);
 

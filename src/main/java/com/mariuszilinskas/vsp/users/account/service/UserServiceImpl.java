@@ -42,10 +42,10 @@ public class UserServiceImpl implements UserService {
         checkEmailExists(request.email());
         User newUser = createAndSaveUser(request);
 
-        var credentialsRequest = UserMapper.toCredentialsRequest(newUser, request.password());
+        var credentialsRequest = UserMapper.mapToCredentialsRequest(newUser, request.password());
         rabbitMQProducer.sendCreateCredentialsMessage(credentialsRequest);
 
-        var profileRequest = UserMapper.toDefaultProfileRequest(newUser);
+        var profileRequest = UserMapper.mapToDefaultProfileRequest(newUser);
         rabbitMQProducer.sendCreateUserDefaultProfileMessage(profileRequest);
 
         return UserMapper.mapToUserResponse(newUser);

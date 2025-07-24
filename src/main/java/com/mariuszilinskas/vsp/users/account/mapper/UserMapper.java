@@ -54,7 +54,7 @@ public class UserMapper {
         );
     }
 
-    public static CredentialsRequest toCredentialsRequest(User user, String password) {
+    public static CredentialsRequest mapToCredentialsRequest(User user, String password) {
         return new CredentialsRequest(
                 user.getId(),
                 user.getFirstName(),
@@ -63,7 +63,7 @@ public class UserMapper {
         );
     }
 
-    public static CreateUserDefaultProfileRequest toDefaultProfileRequest(User user) {
+    public static CreateUserDefaultProfileRequest mapToDefaultProfileRequest(User user) {
         return new CreateUserDefaultProfileRequest(
                 user.getId(),
                 user.getFirstName()

@@ -33,7 +33,7 @@ public class AddressMapperTest {
     // ------------------------------------
 
     @Test
-    void shouldMapFromUpdateAddressRequestWithUserId() {
+    void testMapFromUpdateAddressRequest_Success() {
         Address address = AddressMapper.mapFromUpdateAddressRequest(userId, request);
 
         assertEquals(userId, address.getUserId());
@@ -47,7 +47,7 @@ public class AddressMapperTest {
     }
 
     @Test
-    void shouldMapFromUpdateAddressRequestWithExistingAddress() {
+    void testMapFromUpdateAddressRequestWithExistingAddress_Success() {
         Address existing = new Address();
         existing.setUserId(userId);
 
