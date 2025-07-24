@@ -74,7 +74,7 @@ public class AppExceptionHandler {
         return buildErrorResponse(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    // -----------------------------------------------------------
+    // ---------------------- Shared -----------------------------
 
     /**
      * This method builds the error response for a given exception.

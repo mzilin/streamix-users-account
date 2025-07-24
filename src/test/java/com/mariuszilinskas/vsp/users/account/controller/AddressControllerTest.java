@@ -38,8 +38,6 @@ public class AddressControllerTest {
     private final Address address = new Address();
     private UpdateAddressRequest request;
 
-    // ------------------------------------
-
     @BeforeEach
     void setup() {
         address.setId(addressId);
@@ -57,8 +55,6 @@ public class AddressControllerTest {
                 "AB12 3CD"
         );
     }
-
-    // ------------------------------------
 
     @Test
     void testCreateAddress_Success() throws Exception {

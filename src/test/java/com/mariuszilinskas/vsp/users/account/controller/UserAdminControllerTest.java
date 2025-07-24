@@ -31,8 +31,6 @@ public class UserAdminControllerTest {
     private UUID userId;
     private UserAdminResponse userAdminResponse;
 
-    // ------------------------------------
-
     @BeforeEach
     void setup() {
         userId = UUID.randomUUID();
@@ -50,8 +48,6 @@ public class UserAdminControllerTest {
                 null
         );
     }
-
-    // ------------------------------------
 
     @Test
     void testGetUsers_Success() throws Exception {

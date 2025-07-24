@@ -17,8 +17,6 @@ public class UserMapperTest {
     private final UUID userId = UUID.randomUUID();
     private final User user = new User();
 
-    // ------------------------------------
-
     @BeforeEach
     void setUp() {
         user.setId(userId);
@@ -30,8 +28,6 @@ public class UserMapperTest {
         user.setRoles(List.of(UserRole.USER));
         user.setAuthorities(List.of());
     }
-
-    // ------------------------------------
 
     @Test
     void testMapFromCreateRequest_Success() {

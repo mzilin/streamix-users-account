@@ -55,8 +55,6 @@ public class UserController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    // ------------------------------------------------------
-
     @PatchMapping("/{userId}/verify")
     public ResponseEntity<Void> verifyUser(@PathVariable UUID userId){
         userService.verifyUser(userId);

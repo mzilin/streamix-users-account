@@ -15,8 +15,6 @@ public class AddressMapperTest {
     private final UUID userId = UUID.randomUUID();
     private UpdateAddressRequest request;
 
-    // ------------------------------------
-
     @BeforeEach
     void setup() {
         request = new UpdateAddressRequest(
@@ -29,8 +27,6 @@ public class AddressMapperTest {
                 "AB12 3CD"
         );
     }
-
-    // ------------------------------------
 
     @Test
     void testMapFromUpdateAddressRequest_Success() {

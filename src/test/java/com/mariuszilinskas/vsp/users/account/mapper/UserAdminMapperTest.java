@@ -18,8 +18,6 @@ public class UserAdminMapperTest {
     private final UUID userId = UUID.randomUUID();
     private final User user = new User();
 
-    // ------------------------------------
-
     @BeforeEach
     void setUp() {
         user.setId(userId);
@@ -34,9 +32,6 @@ public class UserAdminMapperTest {
         user.setCreatedAt(ZonedDateTime.now());
         user.setLastActive(ZonedDateTime.now());
     }
-
-    // ------------------------------------
-
 
     @Test
     void testMapToUserAdminResponse_Success() {

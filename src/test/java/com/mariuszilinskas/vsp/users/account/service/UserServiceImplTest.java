@@ -50,8 +50,6 @@ public class UserServiceImplTest {
     private final UUID userId = UUID.randomUUID();
     private final User user = new User();
 
-    // ------------------------------------
-
     @BeforeEach
     void setUp() {
         user.setId(userId);
@@ -71,8 +69,6 @@ public class UserServiceImplTest {
                 "Password123!"
         );
     }
-
-    // ------------------------------------
 
     @Test
     void testCreateUser_Success() {
@@ -124,8 +120,6 @@ public class UserServiceImplTest {
         verify(rabbitMQProducer, never()).sendCreateUserDefaultProfileMessage(any(CreateUserDefaultProfileRequest.class));
     }
 
-    // ------------------------------------
-
     @Test
     void testGetUser_Success() {
         // Arrange
@@ -156,8 +150,6 @@ public class UserServiceImplTest {
 
         verify(userRepository, times(1)).findById(nonExistentId);
     }
-
-    // ------------------------------------
 
     @Test
     void testUpdateUser_Success() {
@@ -199,8 +191,6 @@ public class UserServiceImplTest {
         verify(userRepository, times(1)).findById(nonExistentId);
         verify(userRepository, never()).save(any(User.class));
     }
-
-    // ------------------------------------
 
     @Test
     void testUpdateUserEmail_Success() {
@@ -310,8 +300,6 @@ public class UserServiceImplTest {
         verify(userRepository, never()).save(any(User.class));
     }
 
-    // ------------------------------------
-
     @Test
     void testVerifyUserEmail_Success() {
         // Arrange
@@ -344,8 +332,6 @@ public class UserServiceImplTest {
         verify(userRepository, times(1)).findById(nonExistentId);
         verify(userRepository, never()).save(any(User.class));
     }
-
-    // ------------------------------------
 
     @Test
     void tesGetUserAuthDetailsWithEmail_Success() {
@@ -386,8 +372,6 @@ public class UserServiceImplTest {
         verify(userRepository, never()).save(any(User.class));
     }
 
-    // ------------------------------------
-
     @Test
     void tesGetUserAuthDetailsWithId_Success() {
         // Arrange
@@ -427,8 +411,6 @@ public class UserServiceImplTest {
         verify(userRepository, times(1)).findById(nonExistentUserEId);
         verify(userRepository, never()).save(any(User.class));
     }
-
-    // ------------------------------------
 
     @Test
     void testDeleteUser_Success() {
