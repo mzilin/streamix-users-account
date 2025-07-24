@@ -4,6 +4,7 @@ import com.mariuszilinskas.vsp.users.account.dto.UpdateAddressRequest;
 import com.mariuszilinskas.vsp.users.account.enums.AddressType;
 import com.mariuszilinskas.vsp.users.account.exception.AddressTypeExistsException;
 import com.mariuszilinskas.vsp.users.account.exception.ResourceNotFoundException;
+import com.mariuszilinskas.vsp.users.account.mapper.AddressMapper;
 import com.mariuszilinskas.vsp.users.account.model.Address;
 import com.mariuszilinskas.vsp.users.account.repository.AddressRepository;
 import jakarta.transaction.Transactional;
@@ -27,7 +28,7 @@ public class AddressServiceImpl implements AddressService {
     public Address createAddress(UUID userId, UpdateAddressRequest request) {
         logger.info("Creating new Address for User [userId: '{}']", userId);
         checkTheAddressTypeExists(userId, request.addressType());
-        return populateNewUserWithRequestData(userId, request);
+        return createAndSaveAddress(userId, request);
     }
 
     private void checkTheAddressTypeExists(UUID userId, AddressType addressType) {
@@ -35,10 +36,10 @@ public class AddressServiceImpl implements AddressService {
             throw new AddressTypeExistsException(addressType);
     }
 
-    private Address populateNewUserWithRequestData(UUID userId, UpdateAddressRequest request) {
-        Address address = new Address();
-        address.setUserId(userId);
-        return applyEmailUpdate(address, request);
+    private Address createAndSaveAddress(UUID userId, UpdateAddressRequest request) {
+        Address address = AddressMapper.mapFromUpdateAddressRequest(userId, request);
+        addressRepository.save(address);   // TODO: send via KAFKA to update
+        return address;
     }
 
     @Override
@@ -60,7 +61,9 @@ public class AddressServiceImpl implements AddressService {
 
         Address address = findAddressByIdAndUserId(addressId, userId);
         checkTheAddressTypeExists(userId, request.addressType(), addressId);
-        return applyEmailUpdate(address, request);
+        updateAndSaveAddress(address, request);
+
+        return address;
     }
 
     private void checkTheAddressTypeExists(UUID userId, AddressType addressType, UUID addressId) {
@@ -68,15 +71,9 @@ public class AddressServiceImpl implements AddressService {
             throw new AddressTypeExistsException(addressType);
     }
 
-    private Address applyEmailUpdate(Address address, UpdateAddressRequest request) {
-        address.setAddressType(request.addressType());
-        address.setStreet1(request.street1());
-        address.setStreet2(request.street2());
-        address.setCity(request.city());
-        address.setCounty(request.county());
-        address.setCountry(request.country());
-        address.setPostcode(request.postcode());
-        return addressRepository.save(address);
+    private void updateAndSaveAddress(Address address, UpdateAddressRequest request) {
+        AddressMapper.mapFromUpdateAddressRequest(address, request);
+        addressRepository.save(address);   // TODO: send via KAFKA to update
     }
 
     @Override
@@ -84,7 +81,7 @@ public class AddressServiceImpl implements AddressService {
     public void deleteAddress(UUID userId, UUID addressId) {
         logger.info("Deleting Address [id: '{addressId}] for User [userId: '{}']", userId);
         Address address = findAddressByIdAndUserId(addressId, userId);
-        addressRepository.delete(address);
+        addressRepository.delete(address);   // TODO: send via KAFKA to update
     }
 
     private Address findAddressByIdAndUserId(UUID addressId, UUID userId) {
@@ -96,7 +93,7 @@ public class AddressServiceImpl implements AddressService {
     @Transactional
     public void deleteUserAddresses(UUID userId) {
         logger.info("Deleting all Addresses for User [userId: '{}']", userId);
-        addressRepository.deleteAllByUserId(userId);
+        addressRepository.deleteAllByUserId(userId);   // TODO: send via KAFKA to update
     }
 
 }

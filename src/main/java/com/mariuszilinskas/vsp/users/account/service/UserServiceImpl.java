@@ -154,8 +154,8 @@ public class UserServiceImpl implements UserService {
         logger.info("Deleting User [userId: '{}'], and its data", userId);
         var passwordRequest = new VerifyPasswordRequest(userId, request.password());
         verifyPassword(passwordRequest);
-        userRepository.deleteById(userId);
-        rabbitMQProducer.sendDeleteUserDataMessage(userId);
+        userRepository.deleteById(userId);   // TODO: send via KAFKA to update
+        rabbitMQProducer.sendDeleteUserDataMessage(userId);   // TODO: send via KAFKA to update
     }
 
     private void verifyPassword(VerifyPasswordRequest request) {
