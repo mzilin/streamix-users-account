@@ -34,8 +34,10 @@ public class AddressMapperTest {
 
     @Test
     void testMapFromUpdateAddressRequest_Success() {
+        // Act
         Address address = AddressMapper.mapFromUpdateAddressRequest(userId, request);
 
+        // Assert
         assertEquals(userId, address.getUserId());
         assertEquals(request.addressType(), address.getAddressType());
         assertEquals(request.street1(), address.getStreet1());
@@ -48,11 +50,14 @@ public class AddressMapperTest {
 
     @Test
     void testMapFromUpdateAddressRequestWithExistingAddress_Success() {
+        // Arrange
         Address existing = new Address();
         existing.setUserId(userId);
 
+        // Act
         Address updated = AddressMapper.mapFromUpdateAddressRequest(existing, request);
 
+        // Assert
         assertEquals(userId, updated.getUserId());
         assertEquals(request.addressType(), updated.getAddressType());
         assertEquals(request.street1(), updated.getStreet1());
