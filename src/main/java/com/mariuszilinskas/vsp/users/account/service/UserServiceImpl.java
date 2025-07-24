@@ -53,7 +53,8 @@ public class UserServiceImpl implements UserService {
 
     private User createAndSaveUser(CreateUserRequest request) {
         User user = UserMapper.mapFromCreateRequest(request);
-        return userRepository.save(user);
+        userRepository.save(user);  // TODO: send via KAFKA to update
+        return user;
     }
 
     @Override
@@ -67,15 +68,13 @@ public class UserServiceImpl implements UserService {
     public UserResponse updateUser(UUID userId, UpdateUserRequest request) {
         logger.info("Updating User [id: '{}']", userId);
         User user = findUserById(userId);
-        applyUserUpdates(user, request);
+        updateAndSaveUser(user, request);
         return UserMapper.mapToUserResponse(user);
     }
 
-    private void applyUserUpdates(User user, UpdateUserRequest request) {
-        user.setFirstName(request.firstName());
-        user.setLastName(request.lastName());
-        user.setCountry(request.country());
-        userRepository.save(user);
+    private void updateAndSaveUser(User user, UpdateUserRequest request) {
+        UserMapper.applyUpdates(user, request);
+        userRepository.save(user);  // TODO: send via KAFKA to update
     }
 
     @Override
@@ -102,7 +101,7 @@ public class UserServiceImpl implements UserService {
     private void applyEmailUpdate(User user, UpdateEmailRequest request) {
         user.setEmail(request.email());
         user.setEmailVerified(false);
-        userRepository.save(user);
+        userRepository.save(user);  // TODO: send via KAFKA to update
     }
 
     @Override
@@ -115,7 +114,7 @@ public class UserServiceImpl implements UserService {
 
     private void markEmailAsVerified(User user) {
         user.setEmailVerified(true);
-        userRepository.save(user);
+        userRepository.save(user);  // TODO: send via KAFKA to update
     }
 
     @Override
@@ -146,7 +145,7 @@ public class UserServiceImpl implements UserService {
 
     private void updateLastActive(User user) {
         user.setLastActive(ZonedDateTime.now());
-        userRepository.save(user);
+        userRepository.save(user);  // TODO: send via KAFKA to update
     }
 
     @Override

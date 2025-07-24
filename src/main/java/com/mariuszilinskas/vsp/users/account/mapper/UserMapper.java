@@ -20,6 +20,12 @@ public class UserMapper {
         return user;
     }
 
+    public static void applyUpdates(User user, UpdateUserRequest request) {
+        user.setFirstName(request.firstName());
+        user.setLastName(request.lastName());
+        user.setCountry(request.country());
+    }
+
     public static UserResponse mapToUserResponse(User user) {
         return new UserResponse(
                 user.getId(),

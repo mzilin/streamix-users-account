@@ -57,6 +57,24 @@ public class UserMapperTest {
     }
 
     @Test
+    void shouldApplyUpdates() {
+        // Arrange
+        String newFirstName = "Paul";
+        String newLastName = "Stevens";
+        String newCountry = "England";
+
+        var request = new UpdateUserRequest(newFirstName, newLastName, newCountry);
+
+        // Act
+        UserMapper.applyUpdates(user, request);
+
+        // Assert
+        assertEquals(user.getFirstName(), newFirstName);
+        assertEquals(user.getLastName(), newLastName);
+        assertEquals(user.getCountry(), newCountry);
+    }
+
+    @Test
     void shouldMapToUserResponse() {
         // Act
         UserResponse response = UserMapper.mapToUserResponse(user);
