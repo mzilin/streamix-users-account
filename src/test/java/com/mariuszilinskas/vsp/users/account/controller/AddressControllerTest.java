@@ -33,19 +33,15 @@ public class AddressControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private UUID userId;
-    private UUID addressId;
-    private Address address;
+    private final UUID userId = UUID.randomUUID();
+    private final UUID addressId = UUID.randomUUID();
+    private final Address address = new Address();
     private UpdateAddressRequest request;
 
     // ------------------------------------
 
     @BeforeEach
     void setup() {
-        userId = UUID.randomUUID();
-        addressId = UUID.randomUUID();
-
-        address = new Address();
         address.setId(addressId);
         address.setUserId(userId);
         address.setAddressType(AddressType.BILLING);
