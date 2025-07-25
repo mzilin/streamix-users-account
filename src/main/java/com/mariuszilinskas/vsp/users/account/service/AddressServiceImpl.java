@@ -38,8 +38,7 @@ public class AddressServiceImpl implements AddressService {
 
     private Address createAndSaveAddress(UUID userId, UpdateAddressRequest request) {
         Address address = AddressMapper.mapFromUpdateAddressRequest(userId, request);
-        addressRepository.save(address);   // TODO: send via KAFKA to update
-        return address;
+        return addressRepository.save(address);
     }
 
     @Override
@@ -58,12 +57,9 @@ public class AddressServiceImpl implements AddressService {
     @Transactional
     public Address updateAddress(UUID userId, UUID addressId, UpdateAddressRequest request) {
         logger.info("Updating Address [id: '{addressId}] for User [userId: '{}']", userId);
-
         Address address = findAddressByIdAndUserId(addressId, userId);
         checkTheAddressTypeExists(userId, request.addressType(), addressId);
-        updateAndSaveAddress(address, request);
-
-        return address;
+        return updateAndSaveAddress(address, request);
     }
 
     private void checkTheAddressTypeExists(UUID userId, AddressType addressType, UUID addressId) {
@@ -71,9 +67,9 @@ public class AddressServiceImpl implements AddressService {
             throw new AddressTypeExistsException(addressType);
     }
 
-    private void updateAndSaveAddress(Address address, UpdateAddressRequest request) {
+    private Address updateAndSaveAddress(Address address, UpdateAddressRequest request) {
         AddressMapper.mapFromUpdateAddressRequest(address, request);
-        addressRepository.save(address);   // TODO: send via KAFKA to update
+        return addressRepository.save(address);
     }
 
     @Override
@@ -81,7 +77,7 @@ public class AddressServiceImpl implements AddressService {
     public void deleteAddress(UUID userId, UUID addressId) {
         logger.info("Deleting Address [id: '{addressId}] for User [userId: '{}']", userId);
         Address address = findAddressByIdAndUserId(addressId, userId);
-        addressRepository.delete(address);   // TODO: send via KAFKA to update
+        addressRepository.delete(address);
     }
 
     private Address findAddressByIdAndUserId(UUID addressId, UUID userId) {
@@ -93,7 +89,7 @@ public class AddressServiceImpl implements AddressService {
     @Transactional
     public void deleteUserAddresses(UUID userId) {
         logger.info("Deleting all Addresses for User [userId: '{}']", userId);
-        addressRepository.deleteAllByUserId(userId);   // TODO: send via KAFKA to update
+        addressRepository.deleteAllByUserId(userId);
     }
 
 }
