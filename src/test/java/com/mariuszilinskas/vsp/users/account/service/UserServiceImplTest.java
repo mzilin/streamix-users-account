@@ -77,13 +77,13 @@ public class UserServiceImplTest {
         ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
         var credentialsRequest = new CredentialsRequest(
                 userId, createUserRequest.firstName(), createUserRequest.email(), createUserRequest.password());
-        var profileRequest = new CreateDefaultProfileMessage(userId, user.getFirstName());
+        var profileMessage = new CreateDefaultProfileMessage(userId, user.getFirstName());
 
         when(userRepository.existsByEmail(createUserRequest.email()))
                 .thenReturn(false);
         when(userRepository.save(captor.capture())).thenReturn(user);
         when(identityFeignClient.createCredentials(credentialsRequest)).thenReturn(null);
-        doNothing().when(rabbitMQProducer).sendCreateDefaultProfileMessage(profileRequest);
+        doNothing().when(rabbitMQProducer).sendCreateDefaultProfileMessage(profileMessage);
 
         // Act
         UserResponse response = userService.createUser(createUserRequest);
@@ -95,7 +95,7 @@ public class UserServiceImplTest {
         verify(userRepository, times(1)).existsByEmail(createUserRequest.email());
         verify(userRepository, times(1)).save(captor.capture());
         verify(identityFeignClient, times(1)).createCredentials(credentialsRequest);
-        verify(rabbitMQProducer, times(1)).sendCreateDefaultProfileMessage(profileRequest);
+        verify(rabbitMQProducer, times(1)).sendCreateDefaultProfileMessage(profileMessage);
 
         User savedUser = captor.getValue();
         assertEquals(createUserRequest.firstName(), savedUser.getFirstName());
@@ -358,8 +358,8 @@ public class UserServiceImplTest {
     @Test
     void tesGetUserAuthDetailsWithEmail_Success() {
         // Arrange
-        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
         when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
+        doNothing().when(rabbitMQProducer).sendUpdateLastActiveMessage(any(UserLastActiveMessage.class));
 
         // Act
         AuthDetailsResponse response = userService.getUserAuthDetailsByEmail(user.getEmail());
@@ -371,13 +371,8 @@ public class UserServiceImplTest {
         assertThat(user.getAuthorities()).containsExactlyInAnyOrderElementsOf(response.authorities());
 
         verify(userRepository, times(1)).findByEmail(user.getEmail());
-        verify(userRepository, times(1)).save(captor.capture());
-
-        User savedUser = captor.getValue();
-        ZonedDateTime now = ZonedDateTime.now();
-        ZonedDateTime savedUserLastActive = savedUser.getLastActive();
-        long secondsDifference = Math.abs(ChronoUnit.SECONDS.between(now, savedUserLastActive));
-        assertTrue(secondsDifference <= 1); // 1 second tolerance
+        verify(rabbitMQProducer, times(1)).sendUpdateLastActiveMessage(any(UserLastActiveMessage.class));
+        verify(userRepository, never()).save(any(User.class));
     }
 
     @Test
@@ -397,9 +392,8 @@ public class UserServiceImplTest {
     @Test
     void tesGetUserAuthDetailsWithId_Success() {
         // Arrange
-        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(userRepository.save(captor.capture())).thenReturn(user);
+        doNothing().when(rabbitMQProducer).sendUpdateLastActiveMessage(any(UserLastActiveMessage.class));
 
         // Act
         AuthDetailsResponse response = userService.getUserAuthDetailsByUserId(userId);
@@ -411,13 +405,8 @@ public class UserServiceImplTest {
         assertThat(user.getAuthorities()).containsExactlyInAnyOrderElementsOf(response.authorities());
 
         verify(userRepository, times(1)).findById(userId);
-        verify(userRepository, times(1)).save(captor.capture());
-
-        User savedUser = captor.getValue();
-        ZonedDateTime now = ZonedDateTime.now();
-        ZonedDateTime savedUserLastActive = savedUser.getLastActive();
-        long secondsDifference = Math.abs(ChronoUnit.SECONDS.between(now, savedUserLastActive));
-        assertTrue(secondsDifference <= 1); // 1 second tolerance
+        verify(rabbitMQProducer, times(1)).sendUpdateLastActiveMessage(any(UserLastActiveMessage.class));
+        verify(userRepository, never()).save(any(User.class));
     }
 
     @Test
@@ -431,6 +420,40 @@ public class UserServiceImplTest {
 
         // Assert
         verify(userRepository, times(1)).findById(nonExistentUserEId);
+        verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    void testUpdateLastActiveInDb_Success() {
+        // Arrange
+        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+        // Act
+        userService.updateLastActiveInDb(userId, ZonedDateTime.now());
+
+        // Assert
+        verify(userRepository, times(1)).findById(userId);
+        verify(userRepository, times(1)).save(captor.capture());
+
+        User savedUser = captor.getValue();
+        ZonedDateTime now = ZonedDateTime.now();
+        ZonedDateTime savedUserLastActive = savedUser.getLastActive();
+        long secondsDifference = Math.abs(ChronoUnit.SECONDS.between(now, savedUserLastActive));
+        assertTrue(secondsDifference <= 1); // 1 second tolerance
+    }
+
+    @Test
+    void testUpdateLastActiveInDb_NotFound() {
+        // Arrange
+        UUID nonExistentId = UUID.randomUUID();
+        when(userRepository.findById(nonExistentId)).thenReturn(Optional.empty());
+
+        // Assert & Act
+        assertThrows(ResourceNotFoundException.class, () -> userService.updateLastActiveInDb(nonExistentId, ZonedDateTime.now()));
+
+        // Assert
+        verify(userRepository, times(1)).findById(nonExistentId);
         verify(userRepository, never()).save(any(User.class));
     }
 
