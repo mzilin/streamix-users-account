@@ -1,5 +1,6 @@
 package com.mariuszilinskas.vsp.users.account.consumer;
 
+import com.mariuszilinskas.vsp.users.account.dto.UserLastActiveMessage;
 import com.mariuszilinskas.vsp.users.account.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -18,8 +19,14 @@ public class RabbitMQConsumer {
 
     @RabbitListener(queues = "${rabbitmq.queues.verify-account}")
     public void consumeVerifyAccountMessage(UUID userId) {
-        logger.info("Received request to verify account for User [userId: {}]", userId);
+        logger.info("Received message to verify account for User [userId: {}]", userId);
         userService.verifyUser(userId);
+    }
+
+    @RabbitListener(queues = "${rabbitmq.queues.update-last-active}")
+    public void consumeUpdateLastActiveMessage(UserLastActiveMessage message) {
+        logger.info("Received message to update lastActive for User [userId: '{}']", message.userId());
+        userService.updateLastActiveInDb(message.userId(), message.lastActive());
     }
 
 }
