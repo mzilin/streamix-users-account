@@ -20,11 +20,12 @@ rabbitmq:
   exchange: dummy-exchange
   queues:
     verify-account: dummy-queue
+    update-last-active: dummy-queue
   routing-keys:
-    create-credentials: dummy-key
     profile-setup: dummy-key
     verify-account: dummy-key
     reset-passcode: dummy-key
+    update-last-active: dummy-key
     delete-user-data: dummy-key
 
 # Eureka configuration for CI

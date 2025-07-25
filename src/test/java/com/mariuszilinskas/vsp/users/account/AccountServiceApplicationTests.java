@@ -82,7 +82,7 @@ class AccountServiceApplicationTests {
     }
 
     @Test
-    void authFeignClientBeanLoads() {
+    void identityFeignClientBeanLoads() {
         assertNotNull(identityFeignClient, "Identity Feign Client should have been auto-wired by Spring Context");
     }
 
