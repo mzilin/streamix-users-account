@@ -1,10 +1,11 @@
 package com.mariuszilinskas.vsp.users.account.service;
 
-import com.mariuszilinskas.vsp.users.account.client.AuthFeignClient;
+import com.mariuszilinskas.vsp.users.account.client.IdentityFeignClient;
 import com.mariuszilinskas.vsp.users.account.dto.*;
 import com.mariuszilinskas.vsp.users.account.exception.EmailExistsException;
 import com.mariuszilinskas.vsp.users.account.exception.PasswordValidationException;
 import com.mariuszilinskas.vsp.users.account.exception.ResourceNotFoundException;
+import com.mariuszilinskas.vsp.users.account.exception.CreateCredentialsException;
 import com.mariuszilinskas.vsp.users.account.mapper.UserMapper;
 import com.mariuszilinskas.vsp.users.account.producer.RabbitMQProducer;
 import com.mariuszilinskas.vsp.users.account.model.User;
@@ -30,7 +31,7 @@ import java.util.UUID;
 public class UserServiceImpl implements UserService {
 
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
-    private final AuthFeignClient authFeignClient;
+    private final IdentityFeignClient identityFeignClient;
     private final UserRepository userRepository;
     private final RabbitMQProducer rabbitMQProducer;
 
@@ -43,7 +44,7 @@ public class UserServiceImpl implements UserService {
         User newUser = createAndSaveUser(request);
 
         var credentialsRequest = UserMapper.mapToCredentialsRequest(newUser, request.password());
-        rabbitMQProducer.sendCreateCredentialsMessage(credentialsRequest);  // TODO: use gRPC or Feign
+        createCredentials(credentialsRequest);  // TODO: use gRPC
 
         var profileRequest = UserMapper.mapToDefaultProfileRequest(newUser);
         rabbitMQProducer.sendCreateUserDefaultProfileMessage(profileRequest);
@@ -54,6 +55,15 @@ public class UserServiceImpl implements UserService {
     private User createAndSaveUser(CreateUserRequest request) {
         User user = UserMapper.mapFromCreateRequest(request);
         return userRepository.save(user);
+    }
+
+    private void createCredentials (CredentialsRequest request) {
+        try {
+            identityFeignClient.createCredentials(request);
+        } catch (FeignException ex) {
+            logger.error("Feign Exception when creating user credentials: Status {}, Body {}", ex.status(), ex.contentUTF8());
+            throw new CreateCredentialsException(request.userId());
+        }
     }
 
     @Override
@@ -159,7 +169,7 @@ public class UserServiceImpl implements UserService {
 
     private void verifyPassword(VerifyPasswordRequest request) {
         try {
-            authFeignClient.verifyPassword(request);
+            identityFeignClient.verifyPassword(request);
         } catch (FeignException ex) {
             logger.error("Feign Exception when verifying password: Status {}, Body {}", ex.status(), ex.contentUTF8());
             throw new PasswordValidationException();

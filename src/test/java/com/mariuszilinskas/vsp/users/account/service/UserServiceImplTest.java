@@ -1,9 +1,10 @@
 package com.mariuszilinskas.vsp.users.account.service;
 
-import com.mariuszilinskas.vsp.users.account.client.AuthFeignClient;
+import com.mariuszilinskas.vsp.users.account.client.IdentityFeignClient;
 import com.mariuszilinskas.vsp.users.account.dto.*;
 import com.mariuszilinskas.vsp.users.account.enums.UserRole;
 import com.mariuszilinskas.vsp.users.account.enums.UserStatus;
+import com.mariuszilinskas.vsp.users.account.exception.CreateCredentialsException;
 import com.mariuszilinskas.vsp.users.account.exception.EmailExistsException;
 import com.mariuszilinskas.vsp.users.account.exception.PasswordValidationException;
 import com.mariuszilinskas.vsp.users.account.exception.ResourceNotFoundException;
@@ -37,7 +38,7 @@ public class UserServiceImplTest {
     private UserRepository userRepository;
 
     @Mock
-    private AuthFeignClient authFeignClient;
+    private IdentityFeignClient identityFeignClient;
 
     @Mock
     private RabbitMQProducer rabbitMQProducer;
@@ -81,7 +82,7 @@ public class UserServiceImplTest {
         when(userRepository.existsByEmail(createUserRequest.email()))
                 .thenReturn(false);
         when(userRepository.save(captor.capture())).thenReturn(user);
-        doNothing().when(rabbitMQProducer).sendCreateCredentialsMessage(credentialsRequest);
+        when(identityFeignClient.createCredentials(credentialsRequest)).thenReturn(null);
         doNothing().when(rabbitMQProducer).sendCreateUserDefaultProfileMessage(profileRequest);
 
         // Act
@@ -93,7 +94,7 @@ public class UserServiceImplTest {
 
         verify(userRepository, times(1)).existsByEmail(createUserRequest.email());
         verify(userRepository, times(1)).save(captor.capture());
-        verify(rabbitMQProducer, times(1)).sendCreateCredentialsMessage(credentialsRequest);
+        verify(identityFeignClient, times(1)).createCredentials(credentialsRequest);
         verify(rabbitMQProducer, times(1)).sendCreateUserDefaultProfileMessage(profileRequest);
 
         User savedUser = captor.getValue();
@@ -117,6 +118,27 @@ public class UserServiceImplTest {
         verify(userRepository, times(1)).existsByEmail(createUserRequest.email());
         verify(userRepository, never()).save(any(User.class));
         verify(rabbitMQProducer, never()).sendCreateCredentialsMessage(any(CredentialsRequest.class));
+        verify(rabbitMQProducer, never()).sendCreateUserDefaultProfileMessage(any(CreateUserDefaultProfileRequest.class));
+    }
+
+    @Test
+    void testCreateUser_ErrorCreatingCredentials() {
+        // Arrange
+        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+        var credentialsRequest = new CredentialsRequest(
+                userId, createUserRequest.firstName(), createUserRequest.email(), createUserRequest.password());
+
+        when(userRepository.existsByEmail(createUserRequest.email()))
+                .thenReturn(false);
+        when(userRepository.save(captor.capture())).thenReturn(user);
+        doThrow(feignException).when(identityFeignClient).createCredentials(credentialsRequest);
+
+        // Act & Assert
+        assertThrows(CreateCredentialsException.class, () -> userService.createUser(createUserRequest));
+
+        verify(userRepository, times(1)).existsByEmail(createUserRequest.email());
+        verify(userRepository, times(1)).save(captor.capture());
+        verify(identityFeignClient, times(1)).createCredentials(credentialsRequest);
         verify(rabbitMQProducer, never()).sendCreateUserDefaultProfileMessage(any(CreateUserDefaultProfileRequest.class));
     }
 
@@ -207,7 +229,7 @@ public class UserServiceImplTest {
         var passwordRequest = new VerifyPasswordRequest(userId, password);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(authFeignClient.verifyPassword(passwordRequest)).thenReturn(null);
+        when(identityFeignClient.verifyPassword(passwordRequest)).thenReturn(null);
         when(userRepository.existsByEmail(emailRequest.email())).thenReturn(false);
         when(userRepository.save(captor.capture())).thenReturn(user);
         doNothing().when(rabbitMQProducer).sendResetPasscodeMessage(userId);
@@ -222,7 +244,7 @@ public class UserServiceImplTest {
         assertFalse(response.isEmailVerified());
 
         verify(userRepository, times(1)).findById(userId);
-        verify(authFeignClient, times(1)).verifyPassword(passwordRequest);
+        verify(identityFeignClient, times(1)).verifyPassword(passwordRequest);
         verify(userRepository, times(1)).existsByEmail(newEmail);
         verify(userRepository, times(1)).save(captor.capture());
         verify(rabbitMQProducer, times(1)).sendResetPasscodeMessage(userId);
@@ -244,14 +266,14 @@ public class UserServiceImplTest {
         var passwordRequest = new VerifyPasswordRequest(userId, password);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        doThrow(feignException).when(authFeignClient).verifyPassword(passwordRequest);
+        doThrow(feignException).when(identityFeignClient).verifyPassword(passwordRequest);
 
         // Act & Assert
         assertThrows(PasswordValidationException.class, () -> userService.updateUserEmail(userId, emailRequest));
 
         // Assert
         verify(userRepository, times(1)).findById(userId);
-        verify(authFeignClient, times(1)).verifyPassword(passwordRequest);
+        verify(identityFeignClient, times(1)).verifyPassword(passwordRequest);
         verify(userRepository, never()).existsByEmail(anyString());
         verify(userRepository, never()).save(any(User.class));
         verify(rabbitMQProducer, never()).sendResetPasscodeMessage(any(UUID.class));
@@ -271,7 +293,7 @@ public class UserServiceImplTest {
 
         // Assert
         verify(userRepository, times(1)).findById(nonExistentId);
-        verify(authFeignClient, never()).verifyPassword(any(VerifyPasswordRequest.class));
+        verify(identityFeignClient, never()).verifyPassword(any(VerifyPasswordRequest.class));
         verify(userRepository, never()).existsByEmail(newEmail);
         verify(userRepository, never()).save(any(User.class));
         verify(rabbitMQProducer, never()).sendResetPasscodeMessage(any(UUID.class));
@@ -287,7 +309,7 @@ public class UserServiceImplTest {
         var passwordRequest = new VerifyPasswordRequest(userId, password);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(authFeignClient.verifyPassword(passwordRequest)).thenReturn(null);
+        when(identityFeignClient.verifyPassword(passwordRequest)).thenReturn(null);
         when(userRepository.existsByEmail(newEmail)).thenReturn(true);
 
         // Assert & Act
@@ -295,7 +317,7 @@ public class UserServiceImplTest {
 
         // Assert
         verify(userRepository, times(1)).findById(userId);
-        verify(authFeignClient, times(1)).verifyPassword(passwordRequest);
+        verify(identityFeignClient, times(1)).verifyPassword(passwordRequest);
         verify(userRepository, times(1)).existsByEmail(newEmail);
         verify(userRepository, never()).save(any(User.class));
     }
@@ -419,7 +441,7 @@ public class UserServiceImplTest {
         var deleteRequest = new DeleteUserRequest(password);
         var passwordRequest = new VerifyPasswordRequest(userId, password);
 
-        when(authFeignClient.verifyPassword(passwordRequest)).thenReturn(null);
+        when(identityFeignClient.verifyPassword(passwordRequest)).thenReturn(null);
         doNothing().when(userRepository).deleteById(userId);
         doNothing().when(rabbitMQProducer).sendDeleteUserDataMessage(userId);
 
@@ -427,7 +449,7 @@ public class UserServiceImplTest {
         userService.deleteUser(userId, deleteRequest);
 
         // Assert
-        verify(authFeignClient, times(1)).verifyPassword(passwordRequest);
+        verify(identityFeignClient, times(1)).verifyPassword(passwordRequest);
         verify(userRepository, times(1)).deleteById(userId);
         verify(rabbitMQProducer, times(1)).sendDeleteUserDataMessage(userId);
     }
@@ -439,13 +461,13 @@ public class UserServiceImplTest {
         var deleteRequest = new DeleteUserRequest(password);
         var passwordRequest = new VerifyPasswordRequest(userId, password);
 
-        doThrow(feignException).when(authFeignClient).verifyPassword(passwordRequest);
+        doThrow(feignException).when(identityFeignClient).verifyPassword(passwordRequest);
 
         // Act & Assert
         assertThrows(PasswordValidationException.class, () -> userService.deleteUser(userId, deleteRequest));
 
         // Assert
-        verify(authFeignClient, times(1)).verifyPassword(passwordRequest);
+        verify(identityFeignClient, times(1)).verifyPassword(passwordRequest);
         verify(userRepository, never()).deleteById(any(UUID.class));
         verify(rabbitMQProducer, never()).sendDeleteUserDataMessage(any(UUID.class));
     }
@@ -458,13 +480,13 @@ public class UserServiceImplTest {
         var deleteRequest = new DeleteUserRequest(password);
         var passwordRequest = new VerifyPasswordRequest(nonExtentUserId, password);
 
-        doThrow(feignException).when(authFeignClient).verifyPassword(passwordRequest);
+        doThrow(feignException).when(identityFeignClient).verifyPassword(passwordRequest);
 
         // Act & Assert
         assertThrows(PasswordValidationException.class, () -> userService.deleteUser(nonExtentUserId, deleteRequest));
 
         // Assert
-        verify(authFeignClient, times(1)).verifyPassword(passwordRequest);
+        verify(identityFeignClient, times(1)).verifyPassword(passwordRequest);
         verify(userRepository, never()).deleteById(any(UUID.class));
         verify(rabbitMQProducer, never()).sendDeleteUserDataMessage(any(UUID.class));
     }
