@@ -126,9 +126,9 @@ public class UserMapperTest {
     }
 
     @Test
-    void testMapToDefaultProfileRequest_Success() {
+    void testMapToDefaultProfileMessage_Success() {
         // Act
-        CreateUserDefaultProfileRequest profileRequest = UserMapper.mapToDefaultProfileRequest(user);
+        CreateDefaultProfileMessage profileRequest = UserMapper.mapToDefaultProfileMessage(user);
 
         // Assert
         assertEquals(userId, profileRequest.userId());

@@ -63,8 +63,8 @@ public class UserMapper {
         );
     }
 
-    public static CreateUserDefaultProfileRequest mapToDefaultProfileRequest(User user) {
-        return new CreateUserDefaultProfileRequest(
+    public static CreateDefaultProfileMessage mapToDefaultProfileMessage(User user) {
+        return new CreateDefaultProfileMessage(
                 user.getId(),
                 user.getFirstName()
         );
