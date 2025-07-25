@@ -43,7 +43,7 @@ public class UserServiceImpl implements UserService {
         User newUser = createAndSaveUser(request);
 
         var credentialsRequest = UserMapper.mapToCredentialsRequest(newUser, request.password());
-        rabbitMQProducer.sendCreateCredentialsMessage(credentialsRequest);
+        rabbitMQProducer.sendCreateCredentialsMessage(credentialsRequest);  // TODO: use gRPC or Feign
 
         var profileRequest = UserMapper.mapToDefaultProfileRequest(newUser);
         rabbitMQProducer.sendCreateUserDefaultProfileMessage(profileRequest);
@@ -53,8 +53,7 @@ public class UserServiceImpl implements UserService {
 
     private User createAndSaveUser(CreateUserRequest request) {
         User user = UserMapper.mapFromCreateRequest(request);
-        userRepository.save(user);  // TODO: send via KAFKA to update
-        return user;
+        return userRepository.save(user);
     }
 
     @Override
@@ -74,7 +73,7 @@ public class UserServiceImpl implements UserService {
 
     private void updateAndSaveUser(User user, UpdateUserRequest request) {
         UserMapper.applyUpdates(user, request);
-        userRepository.save(user);  // TODO: send via KAFKA to update
+        userRepository.save(user);
     }
 
     @Override
@@ -86,7 +85,7 @@ public class UserServiceImpl implements UserService {
 
         verifyPassword(passwordRequest);
         checkEmailExists(request.email());
-        applyEmailUpdate(user, request);
+        updateEmail(user, request);
 
         rabbitMQProducer.sendResetPasscodeMessage(userId);
 
@@ -98,10 +97,10 @@ public class UserServiceImpl implements UserService {
             throw new EmailExistsException();
     }
 
-    private void applyEmailUpdate(User user, UpdateEmailRequest request) {
+    private void updateEmail(User user, UpdateEmailRequest request) {
         user.setEmail(request.email());
         user.setEmailVerified(false);
-        userRepository.save(user);  // TODO: send via KAFKA to update
+        userRepository.save(user);
     }
 
     @Override
@@ -114,7 +113,7 @@ public class UserServiceImpl implements UserService {
 
     private void markEmailAsVerified(User user) {
         user.setEmailVerified(true);
-        userRepository.save(user);  // TODO: send via KAFKA to update
+        userRepository.save(user);
     }
 
     @Override
@@ -154,8 +153,8 @@ public class UserServiceImpl implements UserService {
         logger.info("Deleting User [userId: '{}'], and its data", userId);
         var passwordRequest = new VerifyPasswordRequest(userId, request.password());
         verifyPassword(passwordRequest);
-        userRepository.deleteById(userId);   // TODO: send via KAFKA to update
-        rabbitMQProducer.sendDeleteUserDataMessage(userId);   // TODO: send via KAFKA to update
+        userRepository.deleteById(userId);
+        rabbitMQProducer.sendDeleteUserDataMessage(userId);
     }
 
     private void verifyPassword(VerifyPasswordRequest request) {
