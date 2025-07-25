@@ -46,8 +46,8 @@ public class UserServiceImpl implements UserService {
         var credentialsRequest = UserMapper.mapToCredentialsRequest(newUser, request.password());
         createCredentials(credentialsRequest);  // TODO: use gRPC
 
-        var profileRequest = UserMapper.mapToDefaultProfileRequest(newUser);
-        rabbitMQProducer.sendCreateUserDefaultProfileMessage(profileRequest);
+        var profileRequest = UserMapper.mapToDefaultProfileMessage(newUser);
+        rabbitMQProducer.sendCreateDefaultProfileMessage(profileRequest);
 
         return UserMapper.mapToUserResponse(newUser);
     }
@@ -130,7 +130,7 @@ public class UserServiceImpl implements UserService {
     public AuthDetailsResponse getUserAuthDetailsByEmail(String email) {
         logger.info("Getting Auth Details for User [email: '{}']", email);
         User user = findUserByEmail(email);
-        updateLastActive(user);
+        updateLastActive(user.getId());
         return UserMapper.mapToAuthDetailsResponse(user);
     }
 
@@ -143,18 +143,27 @@ public class UserServiceImpl implements UserService {
     public AuthDetailsResponse getUserAuthDetailsByUserId(UUID userId) {
         logger.info("Getting Auth Details for User [id: '{}']", userId);
         User user = findUserById(userId);
-        updateLastActive(user);
+        updateLastActive(userId);
         return UserMapper.mapToAuthDetailsResponse(user);
+    }
+
+    private void updateLastActive(UUID userId) {
+        var message = new UserLastActiveMessage(userId, ZonedDateTime.now());
+        rabbitMQProducer.sendUpdateLastActiveMessage(message);
+    }
+
+    @Override
+    @Transactional
+    public void updateLastActiveInDb(UUID userId, ZonedDateTime lastActive) {
+        logger.info("Updating lastActive for User [userId: '{}']", userId);
+        User user = findUserById(userId);
+        user.setLastActive(lastActive);
+        userRepository.save(user);
     }
 
     private User findUserById(UUID userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException(User.class, "id", userId));
-    }
-
-    private void updateLastActive(User user) {
-        user.setLastActive(ZonedDateTime.now());
-        userRepository.save(user);  // TODO: send via KAFKA to update
     }
 
     @Override

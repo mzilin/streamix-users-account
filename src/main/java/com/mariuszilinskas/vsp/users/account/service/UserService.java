@@ -2,6 +2,7 @@ package com.mariuszilinskas.vsp.users.account.service;
 
 import com.mariuszilinskas.vsp.users.account.dto.*;
 
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 public interface UserService {
@@ -19,6 +20,8 @@ public interface UserService {
     AuthDetailsResponse getUserAuthDetailsByEmail(String email);
 
     AuthDetailsResponse getUserAuthDetailsByUserId(UUID id);
+
+    void updateLastActiveInDb(UUID userId, ZonedDateTime lastActive);
 
     void deleteUser(UUID userId, DeleteUserRequest request);
 
