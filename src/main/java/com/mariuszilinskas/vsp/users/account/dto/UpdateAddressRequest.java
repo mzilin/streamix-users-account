@@ -4,25 +4,27 @@ import com.mariuszilinskas.vsp.users.account.enums.AddressType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
+import static com.mariuszilinskas.vsp.users.account.constant.RequestValidationMessages.*;
+
 public record UpdateAddressRequest(
 
-        @NotNull(message = "addressType cannot be null")
+        @NotNull(message = "addressType " + CANNOT_BE_NULL)
         AddressType addressType,
 
-        @NotBlank(message = "street1 cannot be blank")
+        @NotBlank(message = "street1 " + CANNOT_BE_BLANK)
         String street1,
 
         String street2,
 
-        @NotBlank(message = "city cannot be blank")
+        @NotBlank(message = "city " + CANNOT_BE_BLANK)
         String city,
 
         String county,
 
-        @NotBlank(message = "postcode cannot be blank")
+        @NotBlank(message = "postcode " + CANNOT_BE_BLANK)
         String postcode,
 
-        @NotBlank(message = "country cannot be blank")
+        @NotBlank(message = "country " + CANNOT_BE_BLANK)
         String country
 
 ) {

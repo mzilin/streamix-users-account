@@ -5,12 +5,14 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.UUID;
 
+import static com.mariuszilinskas.vsp.users.account.constant.RequestValidationMessages.*;
+
 public record VerifyPasswordRequest(
 
-        @NotNull(message = "userId cannot be null")
+        @NotNull(message = "userId " + CANNOT_BE_NULL)
         UUID userId,
 
-        @NotBlank(message = "password cannot be blank")
+        @NotBlank(message = "password " + CANNOT_BE_BLANK)
         String password
 
 ) {}
