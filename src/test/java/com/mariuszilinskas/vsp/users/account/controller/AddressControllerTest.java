@@ -37,6 +37,7 @@ public class AddressControllerTest {
 
     private final UUID userId = UUID.randomUUID();
     private final UUID addressId = UUID.randomUUID();
+    private final UUID nonExistentId = UUID.randomUUID();
     private final Address address = new Address();
     private UpdateAddressRequest request;
 
@@ -140,13 +141,24 @@ public class AddressControllerTest {
     }
 
     @Test
-    void testGetAddressById_NotFound() throws Exception {
+    void testGetAddressById_UserNotFound() throws Exception {
         // Arrange
-        when(addressService.getAddress(userId, addressId))
-                .thenThrow(new ResourceNotFoundException(Address.class, "id", addressId));
+        when(addressService.getAddress(nonExistentId, addressId))
+                .thenThrow(new ResourceNotFoundException(User.class, "id", nonExistentId));
 
         // Act & Assert
-        mockMvc.perform(get("/address/{userId}/{addressId}", userId, addressId))
+        mockMvc.perform(get("/address/{userId}/{addressId}", nonExistentId, addressId))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void testGetAddressById_AddressNotFound() throws Exception {
+        // Arrange
+        when(addressService.getAddress(userId, nonExistentId))
+                .thenThrow(new ResourceNotFoundException(Address.class, "id", nonExistentId));
+
+        // Act & Assert
+        mockMvc.perform(get("/address/{userId}/{addressId}", userId, nonExistentId))
                 .andExpect(status().isNotFound());
     }
 
@@ -164,13 +176,26 @@ public class AddressControllerTest {
     }
 
     @Test
-    void testUpdateAddress_NotFound() throws Exception {
+    void testUpdateAddress_UserNotFound() throws Exception {
         // Arrange
-        when(addressService.updateAddress(eq(userId), eq(addressId), any()))
-                .thenThrow(new ResourceNotFoundException(Address.class, "id", addressId));
+        when(addressService.updateAddress(eq(nonExistentId), eq(addressId), any()))
+                .thenThrow(new ResourceNotFoundException(User.class, "id", nonExistentId));
 
         // Act & Assert
-        mockMvc.perform(put("/address/{userId}/{addressId}", userId, addressId)
+        mockMvc.perform(put("/address/{userId}/{addressId}", nonExistentId, addressId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void testUpdateAddress_AddressNotFound() throws Exception {
+        // Arrange
+        when(addressService.updateAddress(eq(userId), eq(nonExistentId), any()))
+                .thenThrow(new ResourceNotFoundException(Address.class, "id", nonExistentId));
+
+        // Act & Assert
+        mockMvc.perform(put("/address/{userId}/{addressId}", userId, nonExistentId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isNotFound());
@@ -221,22 +246,22 @@ public class AddressControllerTest {
     @Test
     void testDeleteAddress_UserNotFound() throws Exception {
         // Arrange
-        doThrow(new ResourceNotFoundException(User.class, "id", userId))
-                .when(addressService).deleteAddress(userId, addressId);
+        doThrow(new ResourceNotFoundException(User.class, "id", nonExistentId))
+                .when(addressService).deleteAddress(nonExistentId, addressId);
 
         // Act & Assert
-        mockMvc.perform(delete("/address/{userId}/{addressId}", userId, addressId))
+        mockMvc.perform(delete("/address/{userId}/{addressId}", nonExistentId, addressId))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     void testDeleteAddress_AddressNotFound() throws Exception {
         // Arrange
-        doThrow(new ResourceNotFoundException(Address.class, "id", addressId))
-                .when(addressService).deleteAddress(userId, addressId);
+        doThrow(new ResourceNotFoundException(Address.class, "id", nonExistentId))
+                .when(addressService).deleteAddress(userId, nonExistentId);
 
         // Act & Assert
-        mockMvc.perform(delete("/address/{userId}/{addressId}", userId, addressId))
+        mockMvc.perform(delete("/address/{userId}/{addressId}", userId, nonExistentId))
                 .andExpect(status().isNotFound());
     }
 
@@ -251,11 +276,11 @@ public class AddressControllerTest {
     @Test
     void testDeleteUserAddresses_NotFound() throws Exception {
         // Arrange
-        doThrow(new ResourceNotFoundException(User.class, "id", userId))
-                .when(addressService).deleteUserAddresses(userId);
+        doThrow(new ResourceNotFoundException(User.class, "id", nonExistentId))
+                .when(addressService).deleteUserAddresses(nonExistentId);
 
         // Act & Assert
-        mockMvc.perform(delete("/address/{userId}", userId))
+        mockMvc.perform(delete("/address/{userId}", nonExistentId))
                 .andExpect(status().isNotFound());
     }
 

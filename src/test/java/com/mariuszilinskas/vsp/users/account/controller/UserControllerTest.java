@@ -36,6 +36,7 @@ public class UserControllerTest {
     private ObjectMapper objectMapper;
 
     private final UUID userId = UUID.randomUUID();
+    private final UUID nonExistentId = UUID.randomUUID();
     private CreateUserRequest createUserRequest;
     private UpdateUserRequest updateUserRequest;
     private UpdateEmailRequest updateEmailRequest;
@@ -209,11 +210,11 @@ public class UserControllerTest {
     @Test
     void testGetUser_NotFound() throws Exception {
         // Arrange
-        when(userService.getUser(userId))
-                .thenThrow(new ResourceNotFoundException(User.class, "id", userId));
+        when(userService.getUser(nonExistentId))
+                .thenThrow(new ResourceNotFoundException(User.class, "id", nonExistentId));
 
         // Act & Assert
-        mockMvc.perform(get("/user/{userId}", userId))
+        mockMvc.perform(get("/user/{userId}", nonExistentId))
                 .andExpect(status().isNotFound());
     }
 
@@ -317,11 +318,11 @@ public class UserControllerTest {
     @Test
     void testUpdateUserEmail_NotFound() throws Exception {
         // Arrange
-        when(userService.updateUserEmail(eq(userId), any()))
-                .thenThrow(new ResourceNotFoundException(User.class, "id", userId));
+        when(userService.updateUserEmail(eq(nonExistentId), any()))
+                .thenThrow(new ResourceNotFoundException(User.class, "id", nonExistentId));
 
         // Act & Assert
-        mockMvc.perform(put("/user/{userId}/email", userId)
+        mockMvc.perform(put("/user/{userId}/email", nonExistentId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateEmailRequest)))
                 .andExpect(status().isNotFound());
@@ -339,11 +340,11 @@ public class UserControllerTest {
     @Test
     void testVerifyUser_NotFound() throws Exception {
         // Arrange
-        doThrow(new ResourceNotFoundException(User.class, "id", userId))
-                .when(userService).verifyUser(userId);
+        doThrow(new ResourceNotFoundException(User.class, "id", nonExistentId))
+                .when(userService).verifyUser(nonExistentId);
 
         // Act & Assert
-        mockMvc.perform(patch("/user/{userId}/verify", userId))
+        mockMvc.perform(patch("/user/{userId}/verify", nonExistentId))
                 .andExpect(status().isNotFound());
     }
 
@@ -362,8 +363,9 @@ public class UserControllerTest {
     @Test
     void testGetAuthDetailsByEmail_NotFound() throws Exception {
         // Arrange
-        when(userService.getUserAuthDetailsByEmail("john@example.com"))
-                .thenThrow(new ResourceNotFoundException(User.class, "id", userId));
+        String nonExistingEmail = "john@example.com";
+        when(userService.getUserAuthDetailsByEmail(nonExistingEmail))
+                .thenThrow(new ResourceNotFoundException(User.class, "email", nonExistingEmail));
 
         // Act & Assert
         mockMvc.perform(get("/user/auth-details/by-email")
@@ -386,12 +388,12 @@ public class UserControllerTest {
     @Test
     void testGetAuthDetailsByUserId_NotFound() throws Exception {
         // Arrange
-        when(userService.getUserAuthDetailsByUserId(userId))
-                .thenThrow(new ResourceNotFoundException(User.class, "id", userId));
+        when(userService.getUserAuthDetailsByUserId(nonExistentId))
+                .thenThrow(new ResourceNotFoundException(User.class, "id", nonExistentId));
 
         // Act & Assert
         mockMvc.perform(get("/user/auth-details/by-userid")
-                        .param("userId", userId.toString()))
+                        .param("userId", nonExistentId.toString()))
                 .andExpect(status().isNotFound());
     }
 
@@ -441,11 +443,11 @@ public class UserControllerTest {
     @Test
     void testDeleteUser_NotFound() throws Exception {
         // Arrange
-        doThrow(new ResourceNotFoundException(User.class, "id", userId))
-                .when(userService).deleteUser(eq(userId), any());
+        doThrow(new ResourceNotFoundException(User.class, "id", nonExistentId))
+                .when(userService).deleteUser(eq(nonExistentId), any());
 
         // Act & Assert
-        mockMvc.perform(delete("/user/{userId}", userId)
+        mockMvc.perform(delete("/user/{userId}", nonExistentId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(deleteUserRequest)))
                 .andExpect(status().isNotFound());
