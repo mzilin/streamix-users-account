@@ -35,8 +35,6 @@ public class UserAdminServiceImplTest {
     private final User user = new User();
     private final User user2 = new User();
 
-    // ------------------------------------
-
     @BeforeEach
     void setUp() {
         user.setId(userId);
@@ -58,8 +56,6 @@ public class UserAdminServiceImplTest {
         user2.setAuthorities(List.of());
     }
 
-    // ------------------------------------
-
     @Test
     void testGetUsers() {
         // Arrange
@@ -80,8 +76,6 @@ public class UserAdminServiceImplTest {
 
         verify(userRepository, times(1)).findAll();
     }
-
-    // ------------------------------------
 
     @Test
     void testGrantUserRole_RoleIsNotPresent() {
@@ -117,8 +111,6 @@ public class UserAdminServiceImplTest {
         verify(userRepository, never()).save(user);
     }
 
-    // ------------------------------------
-
     @Test
     void testRemoveUserRole_RoleIsPresent() {
         // Arrange
@@ -152,8 +144,6 @@ public class UserAdminServiceImplTest {
         verify(userRepository, times(1)).findById(userId);
         verify(userRepository, never()).save(user);
     }
-
-    // ------------------------------------
 
     @Test
     void testGrantUserAuthority_AuthorityIsNotPresent() {
@@ -189,8 +179,6 @@ public class UserAdminServiceImplTest {
         verify(userRepository, never()).save(user);
     }
 
-    // ------------------------------------
-
     @Test
     void testRemoveUserAuthority_AuthorityIsPresent() {
         // Arrange
@@ -224,8 +212,6 @@ public class UserAdminServiceImplTest {
         verify(userRepository, times(1)).findById(userId);
         verify(userRepository, never()).save(user);
     }
-
-    // ------------------------------------
 
     @Test
     void testUpdateUserStatus_Suspend() {

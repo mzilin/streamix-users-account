@@ -2,15 +2,17 @@ package com.mariuszilinskas.vsp.users.account.dto;
 
 import jakarta.validation.constraints.NotBlank;
 
+import static com.mariuszilinskas.vsp.users.account.constant.RequestValidationMessages.CANNOT_BE_BLANK;
+
 public record UpdateUserRequest(
 
-        @NotBlank(message = "firstName cannot be blank")
+        @NotBlank(message = "firstName " + CANNOT_BE_BLANK)
         String firstName,
 
-        @NotBlank(message = "lastName cannot be blank")
+        @NotBlank(message = "lastName " + CANNOT_BE_BLANK)
         String lastName,
 
-        @NotBlank(message = "country cannot be blank")
+        @NotBlank(message = "country " + CANNOT_BE_BLANK)
         String country
 
 ) {

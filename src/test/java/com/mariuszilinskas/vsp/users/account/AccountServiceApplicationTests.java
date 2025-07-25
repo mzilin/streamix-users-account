@@ -1,6 +1,6 @@
 package com.mariuszilinskas.vsp.users.account;
 
-import com.mariuszilinskas.vsp.users.account.client.AuthFeignClient;
+import com.mariuszilinskas.vsp.users.account.client.IdentityFeignClient;
 import com.mariuszilinskas.vsp.users.account.config.FeignConfig;
 import com.mariuszilinskas.vsp.users.account.config.RabbitMQConfig;
 import com.mariuszilinskas.vsp.users.account.consumer.RabbitMQConsumer;
@@ -38,7 +38,7 @@ class AccountServiceApplicationTests {
     private UserAdminController userAdminController;
 
     @Autowired
-    private AuthFeignClient authFeignClient;
+    private IdentityFeignClient identityFeignClient;
 
     @Autowired
     private FeignConfig feignConfig;
@@ -82,8 +82,8 @@ class AccountServiceApplicationTests {
     }
 
     @Test
-    void authFeignClientBeanLoads() {
-        assertNotNull(authFeignClient, "Auth Feign Client should have been auto-wired by Spring Context");
+    void identityFeignClientBeanLoads() {
+        assertNotNull(identityFeignClient, "Identity Feign Client should have been auto-wired by Spring Context");
     }
 
     @Test

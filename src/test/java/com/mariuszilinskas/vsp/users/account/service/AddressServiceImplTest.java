@@ -36,8 +36,6 @@ public class AddressServiceImplTest {
     private final Address address = new Address();
     private final Address address2 = new Address();
 
-    // ------------------------------------
-
     @BeforeEach
     void setUp() {
         address.setId(addressId);
@@ -81,8 +79,6 @@ public class AddressServiceImplTest {
         );
     }
 
-    // ------------------------------------
-
     @Test
     void testCreateAddress_Success() {
         // Arrange
@@ -125,8 +121,6 @@ public class AddressServiceImplTest {
         verify(addressRepository, never()).save(any(Address.class));
     }
 
-    // ------------------------------------
-
     @Test
     void testGetAllAddresses_Success() {
         // Arrange
@@ -162,8 +156,6 @@ public class AddressServiceImplTest {
         verify(addressRepository, times(1)).findAllByUserId(nonExistingUserId);
     }
 
-    // ------------------------------------
-
     @Test
     void testGetAddress_Success() {
         // Arrange
@@ -197,8 +189,6 @@ public class AddressServiceImplTest {
 
         verify(addressRepository, times(1)).findByIdAndUserId(addressId, nonExistentId);
     }
-
-    // ------------------------------------
 
     @Test
     void testUpdateUser_Success() {
@@ -251,8 +241,6 @@ public class AddressServiceImplTest {
         verify(addressRepository, never()).save(any(Address.class));
     }
 
-    // ------------------------------------
-
     @Test
     void testDeleteAddress_Success() {
         // Arrange
@@ -283,8 +271,6 @@ public class AddressServiceImplTest {
         verify(addressRepository, times(1)).findByIdAndUserId(addressId, userId);
         verify(addressRepository, never()).delete(any(Address.class));
     }
-
-    // ------------------------------------
 
     @Test
     void testDeleteUserAddresses_Success() {

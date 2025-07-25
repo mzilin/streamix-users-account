@@ -1,7 +1,7 @@
 package com.mariuszilinskas.vsp.users.account.producer;
 
-import com.mariuszilinskas.vsp.users.account.dto.CreateUserDefaultProfileRequest;
-import com.mariuszilinskas.vsp.users.account.dto.CredentialsRequest;
+import com.mariuszilinskas.vsp.users.account.dto.CreateDefaultProfileMessage;
+import com.mariuszilinskas.vsp.users.account.dto.UserLastActiveMessage;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,31 +21,31 @@ public class RabbitMQProducer {
     @Value("${rabbitmq.exchange}")
     private String exchange;
 
-    @Value("${rabbitmq.routing-keys.create-credentials}")
-    private String createCredentialsRoutingKey;
-
     @Value("${rabbitmq.routing-keys.profile-setup}")
     private String profileSetupRoutingKey;
 
     @Value("${rabbitmq.routing-keys.reset-passcode}")
     private String resetPasscodeRoutingKey;
 
+    @Value("${rabbitmq.routing-keys.update-last-active}")
+    private String updateLastActiveRoutingKey;
+
     @Value("${rabbitmq.routing-keys.delete-user-data}")
     private String deleteUserDataRoutingKey;
 
-    public void sendCreateCredentialsMessage(CredentialsRequest request) {
-        logger.info("Sending message to create user credentials: {}", request);
-        rabbitTemplate.convertAndSend(exchange, createCredentialsRoutingKey, request);
-    }
-
-    public void sendCreateUserDefaultProfileMessage(CreateUserDefaultProfileRequest request) {
-        logger.info("Sending message to create default user profile: {}", request);
-        rabbitTemplate.convertAndSend(exchange, profileSetupRoutingKey, request);
+    public void sendCreateDefaultProfileMessage(CreateDefaultProfileMessage message) {
+        logger.info("Sending message to create default user profile: {}", message);
+        rabbitTemplate.convertAndSend(exchange, profileSetupRoutingKey, message);
     }
 
     public void sendResetPasscodeMessage(UUID userId) {
         logger.info("Sending message to create user passcode: {}", userId);
         rabbitTemplate.convertAndSend(exchange, resetPasscodeRoutingKey, userId);
+    }
+
+    public void sendUpdateLastActiveMessage(UserLastActiveMessage message) {
+        logger.info("Sending message to update lastActive for User [userId: '{}']", message.userId());
+        rabbitTemplate.convertAndSend(exchange, updateLastActiveRoutingKey, message);
     }
 
     public void sendDeleteUserDataMessage(UUID userId) {

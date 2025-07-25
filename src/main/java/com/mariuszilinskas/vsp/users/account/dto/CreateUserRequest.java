@@ -5,29 +5,30 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
+import static com.mariuszilinskas.vsp.users.account.constant.RequestValidationMessages.*;
+
 public record CreateUserRequest(
 
-        @NotBlank(message = "firstName cannot be blank")
+        @NotBlank(message = "firstName " + CANNOT_BE_BLANK)
         String firstName,
 
-        @NotBlank(message = "lastName cannot be blank")
+        @NotBlank(message = "lastName " + CANNOT_BE_BLANK)
         String lastName,
 
-        @NotBlank(message = "email cannot be blank")
-        @Email(message = "email should be valid")
+        @NotBlank(message = "email " + CANNOT_BE_BLANK)
+        @Email(message = INVALID_EMAIL)
         String email,
 
-        @NotBlank(message = "country cannot be blank")
+        @NotBlank(message = "country " + CANNOT_BE_BLANK)
         String country,
 
-        @NotBlank(message = "password cannot be blank")
-        @Size(min = 8, max = 64, message = "password must be between 8 and 64 characters")
+        @NotBlank(message = "password " + CANNOT_BE_BLANK)
+        @Size(min = 8, max = 64, message = PASSWORD_INCORRECT_LENGTH)
         @Pattern.List({
-                @Pattern(regexp = ".*[a-z].*", message = "password must contain at least one lowercase letter"),
-                @Pattern(regexp = ".*[A-Z].*", message = "password must contain at least one uppercase letter"),
-                @Pattern(regexp = ".*\\d.*", message = "password must contain at least one digit"),
-                @Pattern(regexp = ".*[!@#$%^&*(),.?\":{}|<>].*",
-                        message = "password must contain at least one special character")
+                @Pattern(regexp = ".*[a-z].*", message = PASSWORD_MISSING_LOWERCASE),
+                @Pattern(regexp = ".*[A-Z].*", message = PASSWORD_MISSING_UPPERCASE),
+                @Pattern(regexp = ".*\\d.*", message = PASSWORD_MISSING_DIGIT),
+                @Pattern(regexp = ".*[!@#$%^&*(),.?\":{}|<>].*", message = PASSWORD_MISSING_SPECIAL)
         })
         String password
 

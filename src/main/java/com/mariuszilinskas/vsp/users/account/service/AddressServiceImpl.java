@@ -4,6 +4,7 @@ import com.mariuszilinskas.vsp.users.account.dto.UpdateAddressRequest;
 import com.mariuszilinskas.vsp.users.account.enums.AddressType;
 import com.mariuszilinskas.vsp.users.account.exception.AddressTypeExistsException;
 import com.mariuszilinskas.vsp.users.account.exception.ResourceNotFoundException;
+import com.mariuszilinskas.vsp.users.account.mapper.AddressMapper;
 import com.mariuszilinskas.vsp.users.account.model.Address;
 import com.mariuszilinskas.vsp.users.account.repository.AddressRepository;
 import jakarta.transaction.Transactional;
@@ -27,7 +28,7 @@ public class AddressServiceImpl implements AddressService {
     public Address createAddress(UUID userId, UpdateAddressRequest request) {
         logger.info("Creating new Address for User [userId: '{}']", userId);
         checkTheAddressTypeExists(userId, request.addressType());
-        return populateNewUserWithRequestData(userId, request);
+        return createAndSaveAddress(userId, request);
     }
 
     private void checkTheAddressTypeExists(UUID userId, AddressType addressType) {
@@ -35,10 +36,9 @@ public class AddressServiceImpl implements AddressService {
             throw new AddressTypeExistsException(addressType);
     }
 
-    private Address populateNewUserWithRequestData(UUID userId, UpdateAddressRequest request) {
-        Address address = new Address();
-        address.setUserId(userId);
-        return applyEmailUpdate(address, request);
+    private Address createAndSaveAddress(UUID userId, UpdateAddressRequest request) {
+        Address address = AddressMapper.mapFromUpdateAddressRequest(userId, request);
+        return addressRepository.save(address);
     }
 
     @Override
@@ -57,10 +57,9 @@ public class AddressServiceImpl implements AddressService {
     @Transactional
     public Address updateAddress(UUID userId, UUID addressId, UpdateAddressRequest request) {
         logger.info("Updating Address [id: '{addressId}] for User [userId: '{}']", userId);
-
         Address address = findAddressByIdAndUserId(addressId, userId);
         checkTheAddressTypeExists(userId, request.addressType(), addressId);
-        return applyEmailUpdate(address, request);
+        return updateAndSaveAddress(address, request);
     }
 
     private void checkTheAddressTypeExists(UUID userId, AddressType addressType, UUID addressId) {
@@ -68,14 +67,8 @@ public class AddressServiceImpl implements AddressService {
             throw new AddressTypeExistsException(addressType);
     }
 
-    private Address applyEmailUpdate(Address address, UpdateAddressRequest request) {
-        address.setAddressType(request.addressType());
-        address.setStreet1(request.street1());
-        address.setStreet2(request.street2());
-        address.setCity(request.city());
-        address.setCounty(request.county());
-        address.setCountry(request.country());
-        address.setPostcode(request.postcode());
+    private Address updateAndSaveAddress(Address address, UpdateAddressRequest request) {
+        AddressMapper.mapFromUpdateAddressRequest(address, request);
         return addressRepository.save(address);
     }
 

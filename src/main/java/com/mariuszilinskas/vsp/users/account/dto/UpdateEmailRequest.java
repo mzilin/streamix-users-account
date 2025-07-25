@@ -3,13 +3,15 @@ package com.mariuszilinskas.vsp.users.account.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
+import static com.mariuszilinskas.vsp.users.account.constant.RequestValidationMessages.*;
+
 public record UpdateEmailRequest(
 
-        @NotBlank(message = "email cannot be blank")
-        @Email(message = "email should be valid")
+        @NotBlank(message = "email " + CANNOT_BE_BLANK)
+        @Email(message = INVALID_EMAIL)
         String email,
 
-        @NotBlank(message = "password cannot be blank")
+        @NotBlank(message = "password " + CANNOT_BE_BLANK)
         String password
 
 ) {

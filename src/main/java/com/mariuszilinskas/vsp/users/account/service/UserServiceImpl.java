@@ -1,12 +1,12 @@
 package com.mariuszilinskas.vsp.users.account.service;
 
-import com.mariuszilinskas.vsp.users.account.client.AuthFeignClient;
+import com.mariuszilinskas.vsp.users.account.client.IdentityFeignClient;
 import com.mariuszilinskas.vsp.users.account.dto.*;
-import com.mariuszilinskas.vsp.users.account.enums.UserRole;
-import com.mariuszilinskas.vsp.users.account.enums.UserStatus;
 import com.mariuszilinskas.vsp.users.account.exception.EmailExistsException;
 import com.mariuszilinskas.vsp.users.account.exception.PasswordValidationException;
 import com.mariuszilinskas.vsp.users.account.exception.ResourceNotFoundException;
+import com.mariuszilinskas.vsp.users.account.exception.CreateCredentialsException;
+import com.mariuszilinskas.vsp.users.account.mapper.UserMapper;
 import com.mariuszilinskas.vsp.users.account.producer.RabbitMQProducer;
 import com.mariuszilinskas.vsp.users.account.model.User;
 import com.mariuszilinskas.vsp.users.account.repository.UserRepository;
@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -32,85 +31,75 @@ import java.util.UUID;
 public class UserServiceImpl implements UserService {
 
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
-    private final AuthFeignClient authFeignClient;
+    private final IdentityFeignClient identityFeignClient;
     private final UserRepository userRepository;
     private final RabbitMQProducer rabbitMQProducer;
 
     @Override
     @Transactional
     public UserResponse createUser(CreateUserRequest request){
-        logger.info("Creating new User with Email: '{}'", request.email());
+        logger.info("Creating new User with Email: '{}']", request.email());
 
         checkEmailExists(request.email());
-        User newUser = populateNewUserWithRequestData(request);
+        User newUser = createAndSaveUser(request);
 
-        var credentialsRequest = new CredentialsRequest(newUser.getId(), request.firstName(), request.email(), request.password());
-        rabbitMQProducer.sendCreateCredentialsMessage(credentialsRequest);
+        var credentialsRequest = UserMapper.mapToCredentialsRequest(newUser, request.password());
+        createCredentials(credentialsRequest);  // TODO: use gRPC
 
-        var profileRequest = new CreateUserDefaultProfileRequest(newUser.getId(), newUser.getFirstName());
-        rabbitMQProducer.sendCreateUserDefaultProfileMessage(profileRequest);
+        var profileRequest = UserMapper.mapToDefaultProfileMessage(newUser);
+        rabbitMQProducer.sendCreateDefaultProfileMessage(profileRequest);
 
-        return mapToUserResponse(newUser);
+        return UserMapper.mapToUserResponse(newUser);
     }
 
-    private User populateNewUserWithRequestData(CreateUserRequest request) {
-        User user = new User();
-        user.setFirstName(request.firstName());
-        user.setLastName(request.lastName());
-        user.setEmail(request.email());
-        user.setCountry(request.country());
-        user.setRoles(List.of(UserRole.USER));
-        user.setStatus(UserStatus.PENDING);
+    private User createAndSaveUser(CreateUserRequest request) {
+        User user = UserMapper.mapFromCreateRequest(request);
         return userRepository.save(user);
+    }
+
+    private void createCredentials (CredentialsRequest request) {
+        try {
+            identityFeignClient.createCredentials(request);
+        } catch (FeignException ex) {
+            logger.error("Feign Exception when creating user credentials: Status {}, Body {}", ex.status(), ex.contentUTF8());
+            throw new CreateCredentialsException(request.userId());
+        }
     }
 
     @Override
     public UserResponse getUser(UUID userId) {
-        logger.info("Getting User [id: '{}'", userId);
+        logger.info("Getting User [id: '{}']", userId);
         User user = findUserById(userId);
-        return mapToUserResponse(user);
+        return UserMapper.mapToUserResponse(user);
     }
 
     @Override
     public UserResponse updateUser(UUID userId, UpdateUserRequest request) {
         logger.info("Updating User [id: '{}']", userId);
         User user = findUserById(userId);
-        applyUserUpdates(user, request);
-        return mapToUserResponse(user);
+        updateAndSaveUser(user, request);
+        return UserMapper.mapToUserResponse(user);
     }
 
-    private void applyUserUpdates(User user, UpdateUserRequest request) {
-        user.setFirstName(request.firstName());
-        user.setLastName(request.lastName());
-        user.setCountry(request.country());
+    private void updateAndSaveUser(User user, UpdateUserRequest request) {
+        UserMapper.applyUpdates(user, request);
         userRepository.save(user);
-    }
-
-    private static UserResponse mapToUserResponse(User user) {
-        return new UserResponse(
-                user.getId(),
-                user.getFirstName(),
-                user.getLastName(),
-                user.getEmail(),
-                user.getCountry(),
-                user.getStatus().name()
-        );
     }
 
     @Override
     public UpdateEmailResponse updateUserEmail(UUID userId, UpdateEmailRequest request) {
-        logger.info("Updating User Email [id: '{}'", userId);
+        logger.info("Updating User Email [id: '{}']", userId);
 
         User user = findUserById(userId);
         var passwordRequest = new VerifyPasswordRequest(userId, request.password());
 
         verifyPassword(passwordRequest);
         checkEmailExists(request.email());
-        applyEmailUpdate(user, request);
+        updateEmail(user, request);
 
         rabbitMQProducer.sendResetPasscodeMessage(userId);
 
-        return new UpdateEmailResponse(userId, user.getEmail(), user.isEmailVerified());
+        return UserMapper.mapToUpdateEmailResponse(user);
     }
 
     private void checkEmailExists(String email) {
@@ -118,7 +107,7 @@ public class UserServiceImpl implements UserService {
             throw new EmailExistsException();
     }
 
-    private void applyEmailUpdate(User user, UpdateEmailRequest request) {
+    private void updateEmail(User user, UpdateEmailRequest request) {
         user.setEmail(request.email());
         user.setEmailVerified(false);
         userRepository.save(user);
@@ -127,7 +116,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void verifyUser(UUID userId) {
-        logger.info("Verifying User [id: '{}'", userId);
+        logger.info("Verifying User [id: '{}']", userId);
         User user = findUserById(userId);
         markEmailAsVerified(user);
     }
@@ -139,9 +128,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public AuthDetailsResponse getUserAuthDetailsByEmail(String email) {
-        logger.info("Getting Auth Details for User [email: '{}'", email);
+        logger.info("Getting Auth Details for User [email: '{}']", email);
         User user = findUserByEmail(email);
-        return updateLastActiveAndMapToAuthResponse(user);
+        updateLastActive(user.getId());
+        return UserMapper.mapToAuthDetailsResponse(user);
     }
 
     private User findUserByEmail(String email) {
@@ -151,29 +141,29 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public AuthDetailsResponse getUserAuthDetailsByUserId(UUID userId) {
-        logger.info("Getting Auth Details for User [id: '{}'", userId);
+        logger.info("Getting Auth Details for User [id: '{}']", userId);
         User user = findUserById(userId);
-        return updateLastActiveAndMapToAuthResponse(user);
+        updateLastActive(userId);
+        return UserMapper.mapToAuthDetailsResponse(user);
+    }
+
+    private void updateLastActive(UUID userId) {
+        var message = new UserLastActiveMessage(userId, ZonedDateTime.now());
+        rabbitMQProducer.sendUpdateLastActiveMessage(message);
+    }
+
+    @Override
+    @Transactional
+    public void updateLastActiveInDb(UUID userId, ZonedDateTime lastActive) {
+        logger.info("Updating lastActive for User [userId: '{}']", userId);
+        User user = findUserById(userId);
+        user.setLastActive(lastActive);
+        userRepository.save(user);
     }
 
     private User findUserById(UUID userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException(User.class, "id", userId));
-    }
-
-    private AuthDetailsResponse updateLastActiveAndMapToAuthResponse(User user) {
-        user.setLastActive(ZonedDateTime.now());
-        userRepository.save(user);
-        return mapUserToAuthResponse(user);
-    }
-
-    private AuthDetailsResponse mapUserToAuthResponse(User user) {
-        return new AuthDetailsResponse(
-                user.getId(),
-                user.getRoles(),
-                user.getAuthorities(),
-                user.getStatus()
-        );
     }
 
     @Override
@@ -188,7 +178,7 @@ public class UserServiceImpl implements UserService {
 
     private void verifyPassword(VerifyPasswordRequest request) {
         try {
-            authFeignClient.verifyPassword(request);
+            identityFeignClient.verifyPassword(request);
         } catch (FeignException ex) {
             logger.error("Feign Exception when verifying password: Status {}, Body {}", ex.status(), ex.contentUTF8());
             throw new PasswordValidationException();

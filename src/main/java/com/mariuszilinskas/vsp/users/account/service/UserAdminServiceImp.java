@@ -5,6 +5,7 @@ import com.mariuszilinskas.vsp.users.account.enums.UserAuthority;
 import com.mariuszilinskas.vsp.users.account.enums.UserRole;
 import com.mariuszilinskas.vsp.users.account.enums.UserStatus;
 import com.mariuszilinskas.vsp.users.account.exception.ResourceNotFoundException;
+import com.mariuszilinskas.vsp.users.account.mapper.UserAdminMapper;
 import com.mariuszilinskas.vsp.users.account.model.User;
 import com.mariuszilinskas.vsp.users.account.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -35,24 +36,8 @@ public class UserAdminServiceImp implements UserAdminService {
         logger.info("Getting all platform Users");
         List<User> users = userRepository.findAll();
         return users.stream()
-                .map(UserAdminServiceImp::mapToUserAdminResponse)
+                .map(UserAdminMapper::mapToUserAdminResponse)
                 .toList();
-    }
-
-    private static UserAdminResponse mapToUserAdminResponse(User user) {
-        return new UserAdminResponse(
-                user.getId(),
-                user.getFirstName(),
-                user.getLastName(),
-                user.getEmail(),
-                user.getCountry(),
-                user.isEmailVerified(),
-                user.getStatus().name(),
-                user.getRoles(),
-                user.getAuthorities(),
-                user.getCreatedAt(),
-                user.getLastActive()
-        );
     }
 
     @Override
