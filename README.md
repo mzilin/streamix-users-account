@@ -1,13 +1,13 @@
-# Video Streaming Platform – Account Service
+# Streamix – Account Service
 
-![Build](https://img.shields.io/github/actions/workflow/status/mzilin/vsp-users-account/build.yml?label=Build&logo=github&logoColor=white&style=flat)
-![Coverage](https://img.shields.io/codecov/c/github/mzilin/vsp-users-account?label=Coverage&logo=codecov&logoColor=white&style=flat)
+![Build](https://img.shields.io/github/actions/workflow/status/mzilin/streamix-users-account/build.yml?label=Build&logo=github&logoColor=white&style=flat)
+![Coverage](https://img.shields.io/codecov/c/github/mzilin/streamix-users-account?label=Coverage&logo=codecov&logoColor=white&style=flat)
 ![Status](https://img.shields.io/badge/status-in_progress-yellow?label=Status)
 
 
-This repository contains the **Account Service** microservice for the **Video Streaming Platform**, deployed in the **Users** cluster. It is responsible for managing user accounts, including creation, validation, updates and deletion.
+This repository contains the **Account Service** microservice for the **Streamix** (Video Streaming Platform), deployed in the **Users** cluster. It is responsible for managing user accounts, including creation, validation, updates and deletion.
 
-For a complete system overview and links to all microservices, please refer to the [Microservices Hub Repository](https://github.com/mzilin/vsp-microservices-hub).
+For a complete system overview and links to all microservices, please refer to the [Microservices Hub Repository](https://github.com/mzilin/streamix-microservices-hub).
 
 
 ## Table of Contents
@@ -99,12 +99,12 @@ Ensure you have the following installed on your machine:
 
 1. Clone the repository:
     ```bash
-    git clone https://github.com/mzilin/vsp-users-account.git
+    git clone https://github.com/mzilin/streamix-users-account.git
     ```
 
 2. Switch to the `main` branch:
     ```bash
-    cd vsp-users-account
+    cd streamix-users-account
     ```
 
 3. Build the project and run tests:
