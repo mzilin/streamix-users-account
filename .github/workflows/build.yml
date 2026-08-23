@@ -5,11 +5,17 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: read
 
 jobs:
   build:
     runs-on: ubuntu-latest
     name: "Compile and Test"
+    timeout-minutes: 15
 
     steps:
       - name: Checkout code
@@ -23,4 +29,6 @@ jobs:
           cache: 'gradle'
 
       - name: Build project
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: SPRING_PROFILES_ACTIVE=ci ./gradlew build --no-daemon
