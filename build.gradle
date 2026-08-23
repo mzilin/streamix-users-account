@@ -20,6 +20,7 @@ configurations {
 }
 
 repositories {
+    mavenLocal()
     mavenCentral()
 }
 
@@ -32,32 +33,36 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-amqp'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-opentelemetry'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
-    // Cloud-related
+    // Streamix Platform
+    implementation 'com.mariuszilinskas.streamix:streamix-web-support:1.0.1'
+
+    // Spring Cloud
     implementation 'org.springframework.cloud:spring-cloud-starter-config'
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 
-    // Database-related
+    // Database
     implementation 'org.flywaydb:flyway-core:9.22.3'
-    runtimeOnly 'org.postgresql:postgresql'
     runtimeOnly 'com.h2database:h2'
-    testImplementation 'com.h2database:h2'
+    runtimeOnly 'org.postgresql:postgresql'
 
-    // Other dependencies
-    implementation 'org.jetbrains:annotations:24.0.1'
+    // Other
     implementation 'io.github.openfeign:feign-jackson'
+    implementation 'org.jetbrains:annotations:24.0.1'
 
     // Lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
-    // Development only
+    // Development
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
     // Testing
+    testImplementation 'com.h2database:h2'
     testImplementation 'org.mockito:mockito-core:5.3.1'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
