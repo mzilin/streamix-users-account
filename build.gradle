@@ -38,7 +38,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
     // Streamix Platform
-    implementation 'com.mariuszilinskas.streamix:streamix-web-support:1.0.1'
+    implementation 'com.mariuszilinskas.streamix:streamix-web-commons:1.0.1'
 
     // Spring Cloud
     implementation 'org.springframework.cloud:spring-cloud-starter-config'

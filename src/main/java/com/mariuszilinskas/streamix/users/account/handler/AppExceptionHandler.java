@@ -1,8 +1,8 @@
 package com.mariuszilinskas.streamix.users.account.handler;
 
 
-import com.mariuszilinskas.streamix.users.account.dto.ErrorResponse;
-import com.mariuszilinskas.streamix.users.account.dto.FieldErrorResponse;
+import com.mariuszilinskas.streamix.web.dto.ErrorResponse;
+import com.mariuszilinskas.streamix.web.dto.FieldErrorResponse;
 import com.mariuszilinskas.streamix.users.account.exception.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
