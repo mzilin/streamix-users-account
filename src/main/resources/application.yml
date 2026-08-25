@@ -65,9 +65,28 @@ management:
   endpoints:
     web:
       exposure:
-        include: info, health, refresh
+        include: info, health, refresh, prometheus
+  endpoint:
+    health:
+      show-details: always
+  opentelemetry:
+    resource-attributes:
+      service.name: ${spring.application.name}
+      service.namespace: streamix
+      deployment.environment: ${spring.profiles.active}
+    tracing:
+      export:
+        otlp:
+          endpoint: ${OTEL_TRACES_ENDPOINT}
+  otlp:
+    metrics:
+      export:
+        url: ${OTEL_METRICS_ENDPOINT}
 
 logging:
+  structured:
+    format:
+      console: ecs
   level:
     root: INFO
     org.springframework.web: DEBUG
