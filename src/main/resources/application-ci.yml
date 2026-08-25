@@ -33,3 +33,13 @@ eureka:
   client:
     fetchRegistry: false
     registerWithEureka: false
+
+# Management configuration for CI
+management:
+  tracing:
+    export:
+      enabled: false
+  otlp:
+    metrics:
+      export:
+        enabled: false
