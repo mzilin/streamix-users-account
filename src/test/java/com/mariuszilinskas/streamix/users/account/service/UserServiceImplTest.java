@@ -4,7 +4,6 @@ import com.mariuszilinskas.streamix.users.account.client.IdentityFeignClient;
 import com.mariuszilinskas.streamix.users.account.dto.*;
 import com.mariuszilinskas.streamix.users.account.enums.UserRole;
 import com.mariuszilinskas.streamix.users.account.enums.UserStatus;
-import com.mariuszilinskas.streamix.users.account.exception.CreateCredentialsException;
 import com.mariuszilinskas.streamix.users.account.exception.EmailExistsException;
 import com.mariuszilinskas.streamix.users.account.exception.PasswordValidationException;
 import com.mariuszilinskas.streamix.users.account.exception.ResourceNotFoundException;
@@ -82,7 +81,7 @@ public class UserServiceImplTest {
         when(userRepository.existsByEmail(createUserRequest.email()))
                 .thenReturn(false);
         when(userRepository.save(captor.capture())).thenReturn(user);
-        when(identityFeignClient.createCredentials(credentialsRequest)).thenReturn(null);
+        doNothing().when(rabbitMQProducer).sendCreateCredentialsMessage(credentialsRequest);
         doNothing().when(rabbitMQProducer).sendCreateDefaultProfileMessage(profileMessage);
 
         // Act
@@ -94,7 +93,7 @@ public class UserServiceImplTest {
 
         verify(userRepository, times(1)).existsByEmail(createUserRequest.email());
         verify(userRepository, times(1)).save(captor.capture());
-        verify(identityFeignClient, times(1)).createCredentials(credentialsRequest);
+        verify(rabbitMQProducer, times(1)).sendCreateCredentialsMessage(credentialsRequest);
         verify(rabbitMQProducer, times(1)).sendCreateDefaultProfileMessage(profileMessage);
 
         User savedUser = captor.getValue();
@@ -117,28 +116,7 @@ public class UserServiceImplTest {
         // Assert
         verify(userRepository, times(1)).existsByEmail(createUserRequest.email());
         verify(userRepository, never()).save(any(User.class));
-        verify(identityFeignClient, never()).createCredentials(any(CredentialsRequest.class));
-        verify(rabbitMQProducer, never()).sendCreateDefaultProfileMessage(any(CreateDefaultProfileMessage.class));
-    }
-
-    @Test
-    void testCreateUser_ErrorCreatingCredentials() {
-        // Arrange
-        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
-        var credentialsRequest = new CredentialsRequest(
-                userId, createUserRequest.firstName(), createUserRequest.email(), createUserRequest.password());
-
-        when(userRepository.existsByEmail(createUserRequest.email()))
-                .thenReturn(false);
-        when(userRepository.save(captor.capture())).thenReturn(user);
-        doThrow(feignException).when(identityFeignClient).createCredentials(credentialsRequest);
-
-        // Act & Assert
-        assertThrows(CreateCredentialsException.class, () -> userService.createUser(createUserRequest));
-
-        verify(userRepository, times(1)).existsByEmail(createUserRequest.email());
-        verify(userRepository, times(1)).save(captor.capture());
-        verify(identityFeignClient, times(1)).createCredentials(credentialsRequest);
+        verify(rabbitMQProducer, never()).sendCreateCredentialsMessage(any(CredentialsRequest.class));
         verify(rabbitMQProducer, never()).sendCreateDefaultProfileMessage(any(CreateDefaultProfileMessage.class));
     }
 

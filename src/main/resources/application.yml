@@ -18,7 +18,7 @@ spring:
   config:
     import:
       - optional:configserver:discovery://config-server
-      - optional:file:./env.properties
+      - optional:file:../env/dev.properties
   datasource:
     url: ${DB_URL}
     driverClassName: ${DB_DRIVER_CLASS}
@@ -56,6 +56,7 @@ rabbitmq:
     reset-passcode: ${RMQ_RESET_PASSCODE_RK}
     update-last-active: ${RMQ_UPDATE_LAST_ACTIVE_RK}
     delete-user-data: ${RMQ_DELETE_USER_DATA_RK}
+    create-credentials: ${RMQ_CREATE_CREDENTIALS_RK}
 
 # Management properties
 management:

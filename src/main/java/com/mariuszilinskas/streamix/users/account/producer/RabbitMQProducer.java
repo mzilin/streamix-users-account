@@ -1,5 +1,6 @@
 package com.mariuszilinskas.streamix.users.account.producer;
 
+import com.mariuszilinskas.streamix.users.account.dto.CredentialsRequest;
 import com.mariuszilinskas.streamix.users.account.dto.CreateDefaultProfileMessage;
 import com.mariuszilinskas.streamix.users.account.dto.UserLastActiveMessage;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,14 @@ public class RabbitMQProducer {
 
     @Value("${rabbitmq.routing-keys.delete-user-data}")
     private String deleteUserDataRoutingKey;
+
+    @Value("${rabbitmq.routing-keys.create-credentials}")
+    private String createCredentialsRoutingKey;
+
+    public void sendCreateCredentialsMessage(CredentialsRequest request) {
+        logger.info("Sending message to create credentials for User [userId: '{}']", request.userId());
+        rabbitTemplate.convertAndSend(exchange, createCredentialsRoutingKey, request);
+    }
 
     public void sendCreateDefaultProfileMessage(CreateDefaultProfileMessage message) {
         logger.info("Sending message to create default user profile: {}", message);

@@ -27,6 +27,7 @@ rabbitmq:
     reset-passcode: dummy-key
     update-last-active: dummy-key
     delete-user-data: dummy-key
+    create-credentials: dummy-key
 
 # Eureka configuration for CI
 eureka:

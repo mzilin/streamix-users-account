@@ -41,7 +41,7 @@ public class UserServiceImpl implements UserService {
         User newUser = createAndSaveUser(request);
 
         var credentialsRequest = UserMapper.mapToCredentialsRequest(newUser, request.password());
-        createCredentials(credentialsRequest);  // TODO: use gRPC
+        rabbitMQProducer.sendCreateCredentialsMessage(credentialsRequest);
 
         var profileRequest = UserMapper.mapToDefaultProfileMessage(newUser);
         rabbitMQProducer.sendCreateDefaultProfileMessage(profileRequest);
@@ -52,15 +52,6 @@ public class UserServiceImpl implements UserService {
     private User createAndSaveUser(CreateUserRequest request) {
         User user = UserMapper.mapFromCreateRequest(request);
         return userRepository.save(user);
-    }
-
-    private void createCredentials (CredentialsRequest request) {
-        try {
-            identityFeignClient.createCredentials(request);
-        } catch (FeignException ex) {
-            logger.error("Feign Exception when creating user credentials: Status {}, Body {}", ex.status(), ex.contentUTF8());
-            throw new CreateCredentialsException(request.userId());
-        }
     }
 
     @Override
