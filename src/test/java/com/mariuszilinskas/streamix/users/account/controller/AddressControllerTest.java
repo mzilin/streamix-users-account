@@ -18,7 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 import java.util.UUID;
 
-import static com.mariuszilinskas.streamix.users.account.constant.RequestValidationMessages.*;
+import static com.mariuszilinskas.streamix.web.constant.ValidationMessages.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.mockito.Mockito.*;

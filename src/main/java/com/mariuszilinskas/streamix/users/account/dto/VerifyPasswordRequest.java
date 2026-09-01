@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.UUID;
 
-import static com.mariuszilinskas.streamix.users.account.constant.RequestValidationMessages.*;
+import static com.mariuszilinskas.streamix.web.constant.ValidationMessages.*;
 
 public record VerifyPasswordRequest(
 

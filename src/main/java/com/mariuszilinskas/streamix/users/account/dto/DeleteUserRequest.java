@@ -2,7 +2,7 @@ package com.mariuszilinskas.streamix.users.account.dto;
 
 import jakarta.validation.constraints.NotBlank;
 
-import static com.mariuszilinskas.streamix.users.account.constant.RequestValidationMessages.CANNOT_BE_BLANK;
+import static com.mariuszilinskas.streamix.web.constant.ValidationMessages.CANNOT_BE_BLANK;
 
 public record DeleteUserRequest(
 

@@ -3,7 +3,7 @@ package com.mariuszilinskas.streamix.users.account.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
-import static com.mariuszilinskas.streamix.users.account.constant.RequestValidationMessages.*;
+import static com.mariuszilinskas.streamix.web.constant.ValidationMessages.*;
 
 public record UpdateEmailRequest(
 
