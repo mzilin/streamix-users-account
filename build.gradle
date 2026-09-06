@@ -38,40 +38,40 @@ ext {
 dependencies {
     // Core Spring Boot
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation 'org.springframework.boot:spring-boot-starter-amqp'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-opentelemetry'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
-	// Streamix Platform
-    implementation 'com.mariuszilinskas.streamix:streamix-observability:1.0.1'
-	implementation 'com.mariuszilinskas.streamix:streamix-web-commons:1.0.1'
-
     // Spring Cloud
     implementation 'org.springframework.cloud:spring-cloud-starter-config'
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+    implementation 'io.github.openfeign:feign-jackson'
 
-    // Database
+    // Data & Persistence
     implementation 'org.flywaydb:flyway-core:9.22.3'
     runtimeOnly 'com.h2database:h2'
     runtimeOnly 'org.postgresql:postgresql'
 
-    // Other
-    implementation 'io.github.openfeign:feign-jackson'
-    implementation 'org.jetbrains:annotations:24.0.1'
+    // Messaging & Events
+    implementation 'org.springframework.boot:spring-boot-starter-amqp'
+    implementation 'org.springframework.kafka:spring-kafka'
 
-    // Lombok
+    // Streamix Platform
+    implementation 'com.mariuszilinskas.streamix:streamix-observability:1.0.1'
+    implementation 'com.mariuszilinskas.streamix:streamix-web-commons:1.0.1'
+
+    // Tooling
+    implementation 'org.jetbrains:annotations:24.0.1'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
-
-    // Development
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
     // Testing
     testImplementation 'com.h2database:h2'
     testImplementation 'org.mockito:mockito-core:5.3.1'
+    testImplementation 'org.springframework.kafka:spring-kafka-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
 }
