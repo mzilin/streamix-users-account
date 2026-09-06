@@ -33,6 +33,13 @@ spring:
     port: ${RMQ_PORT}
     username: ${RMQ_USERNAME}
     password: ${RMQ_PASSWORD}
+  kafka:
+    bootstrap-servers: kafka:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        "[spring.json.add.type.headers]": false
 
 # Eureka configuration
 eureka:
@@ -57,6 +64,13 @@ rabbitmq:
     update-last-active: ${RMQ_UPDATE_LAST_ACTIVE_RK}
     delete-user-data: ${RMQ_DELETE_USER_DATA_RK}
     create-credentials: ${RMQ_CREATE_CREDENTIALS_RK}
+
+# Kafka settings
+kafka:
+  replication-factor: 1
+  topics:
+    user-registered: streamix.user.registered
+    user-verified: streamix.user.verified
 
 # Management properties
 management:

@@ -56,7 +56,7 @@ dependencies {
 
     // Messaging & Events
     implementation 'org.springframework.boot:spring-boot-starter-amqp'
-    implementation 'org.springframework.kafka:spring-kafka'
+    implementation 'org.springframework.boot:spring-boot-starter-kafka'
 
     // Streamix Platform
     implementation 'com.mariuszilinskas.streamix:streamix-observability:1.0.1'
