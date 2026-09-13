@@ -1,42 +1,39 @@
 package com.mariuszilinskas.streamix.users.account.config;
 
+import com.mariuszilinskas.streamix.users.account.config.properties.KafkaProperties;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.common.config.TopicConfig;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.TopicBuilder;
 
-import java.time.Duration;
-
 @Configuration
 public class KafkaConfig {
 
-    @Value("${kafka.topics.user-registered}")
-    private String userRegisteredTopic;
+    private final KafkaProperties kafkaProperties;
 
-    @Value("${kafka.topics.user-verified}")
-    private String userVerifiedTopic;
-
-    @Value("${kafka.replication-factor}")
-    private int replicationFactor;
+    public KafkaConfig(KafkaProperties kafkaProperties) {
+        this.kafkaProperties = kafkaProperties;
+    }
 
     @Bean
     public NewTopic userRegisteredTopic() {
-        return TopicBuilder.name(userRegisteredTopic)
-                .partitions(6)
-                .replicas(replicationFactor)
-                .config(TopicConfig.RETENTION_MS_CONFIG, String.valueOf(Duration.ofDays(7).toMillis()))
-                .build();
+        return createTopic(kafkaProperties.topics().userRegistered());
     }
 
     @Bean
     public NewTopic userVerifiedTopic() {
-        return TopicBuilder.name(userVerifiedTopic)
-                .partitions(3)
-                .replicas(replicationFactor)
-                .config(TopicConfig.RETENTION_MS_CONFIG, String.valueOf(Duration.ofDays(7).toMillis()))
-                .build();
+        return createTopic(kafkaProperties.topics().userVerified());
     }
 
+    private NewTopic createTopic(KafkaProperties.Topic topic) {
+        return TopicBuilder.name(topic.name())
+                .partitions(topic.partitions())
+                .replicas(kafkaProperties.replicationFactor())
+                .config(
+                        TopicConfig.RETENTION_MS_CONFIG,
+                        String.valueOf(kafkaProperties.retention().toMillis())
+                )
+                .build();
+    }
 }
