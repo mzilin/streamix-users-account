@@ -56,14 +56,14 @@ kafka:
   topics:
     user-registered:
       name: ${KAFKA_USER_REGISTERED_TOPIC}
-      partitions: 6
-      replication-factor: 3
-      retention: 7d
+      partitions: 1
+      replication-factor: 1
+      retention: 1d
     user-verified:
       name: ${KAFKA_USER_VERIFIED_TOPIC}
-      partitions: 3
-      replication-factor: 3
-      retention: 7d
+      partitions: 1
+      replication-factor: 1
+      retention: 1d
 
 rabbitmq:
   exchange: ${RMQ_EXCHANGE}
