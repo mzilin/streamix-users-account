@@ -1,4 +1,4 @@
-# Spring application properties for CI
+# Spring configuration for CI
 spring:
   datasource:
     url: jdbc:h2:mem:testdb
@@ -17,27 +17,29 @@ spring:
   kafka:
     bootstrap-servers: localhost:9092
 
-# RabbitMQ settings for CI
-rabbitmq:
-  exchange: dummy-exchange
-  queues:
-    verify-account: dummy-queue
-    update-last-active: dummy-queue
-  routing-keys:
-    profile-setup: dummy-key
-    verify-account: dummy-key
-    reset-passcode: dummy-key
-    update-last-active: dummy-key
-    delete-user-data: dummy-key
-    create-credentials: dummy-key
-
-# Eureka configuration for CI
+# Service discovery configuration for CI
 eureka:
   client:
     fetchRegistry: false
     registerWithEureka: false
 
-# Management configuration for CI
+# Messaging configuration for CI
+rabbitmq:
+  exchange: dummy-exchange
+  queues:
+    update-last-active: dummy-queue
+  routing-keys:
+    platform-emails: dummy-key
+    reset-passcode: dummy-key
+    update-last-active: dummy-key
+    delete-user-data: dummy-key
+
+# Security configuration for CI
+cryptography:
+  provider: local
+  encryption-key: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+
+# Observability configuration for CI
 management:
   opentelemetry:
     tracing:

@@ -2,14 +2,14 @@
 server:
   port: 8110
 
-# Information for the info endpoint
+# Application metadata
 info:
   app:
     environment: DEV
     name: ${spring.application.name}
     description: Account Service - Local Instance
 
-# Spring application properties
+# Spring properties
 spring:
   application:
     name: users-account
@@ -34,14 +34,14 @@ spring:
     username: ${RMQ_USERNAME}
     password: ${RMQ_PASSWORD}
   kafka:
-    bootstrap-servers: kafka:9092
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       properties:
         "[spring.json.add.type.headers]": false
 
-# Eureka configuration
+# Service discovery properties
 eureka:
   client:
     fetchRegistry: true
@@ -51,28 +51,34 @@ eureka:
   instance:
     preferIpAddress: true
 
-# RabbitMQ settings
+# Messaging properties
+kafka:
+  replication-factor: 1
+  retention: 7d
+  topics:
+    user-registered:
+      name: ${KAFKA_USER_REGISTERED_TOPIC}
+      partitions: 6
+    user-verified:
+      name: ${KAFKA_USER_VERIFIED_TOPIC}
+      partitions: 3
+
 rabbitmq:
   exchange: ${RMQ_EXCHANGE}
   queues:
-    verify-account: ${RMQ_VERIFY_ACCOUNT_Q}
     update-last-active: ${RMQ_UPDATE_LAST_ACTIVE_Q}
   routing-keys:
-    profile-setup: ${RMQ_PROFILE_SETUP_RK}
-    verify-account: ${RMQ_VERIFY_ACCOUNT_RK}
+    platform-emails: ${RMQ_PLATFORM_EMAILS_RK}
     reset-passcode: ${RMQ_RESET_PASSCODE_RK}
     update-last-active: ${RMQ_UPDATE_LAST_ACTIVE_RK}
     delete-user-data: ${RMQ_DELETE_USER_DATA_RK}
-    create-credentials: ${RMQ_CREATE_CREDENTIALS_RK}
 
-# Kafka settings
-kafka:
-  replication-factor: 1
-  topics:
-    user-registered: streamix.user.registered
-    user-verified: streamix.user.verified
+# Security properties
+cryptography:
+  provider: local
+  encryption-key: ${CRYPTOGRAPHY_ENCRYPTION_KEY}
 
-# Management properties
+# Management and observability properties
 management:
   info:
     env:
@@ -98,6 +104,7 @@ management:
       export:
         url: ${OTEL_METRICS_ENDPOINT}
 
+# Logging properties
 logging:
   structured:
     format:
