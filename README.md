@@ -142,7 +142,7 @@ Ensure you have the following installed on your machine:
 
 ### Environment Variables
 
-This microservice requires the following environment variable to be configured:
+This microservice requires the following environment variables to be configured:
 
 TBC
 
