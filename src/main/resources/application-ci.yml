@@ -24,6 +24,19 @@ eureka:
     registerWithEureka: false
 
 # Messaging configuration for CI
+kafka:
+  topics:
+    user-registered:
+      name: dummy-topic
+      partitions: 1
+      replication-factor: 1
+      retention: 1d
+    user-verified:
+      name: dummy-topic
+      partitions: 1
+      replication-factor: 1
+      retention: 1d
+
 rabbitmq:
   exchange: dummy-exchange
   queues:
