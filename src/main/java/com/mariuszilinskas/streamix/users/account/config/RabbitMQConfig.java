@@ -1,59 +1,50 @@
 package com.mariuszilinskas.streamix.users.account.config;
 
+import com.mariuszilinskas.streamix.users.account.properties.RabbitMQProperties;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class RabbitMQConfig {
 
-    @Value("${rabbitmq.exchange}")
-    private String exchange;
+    private final RabbitMQProperties props;
 
-    @Value("${rabbitmq.queues.verify-account}")
-    private String verifyAccountQueue;
-
-    @Value("${rabbitmq.queues.update-last-active}")
-    private String updateLastActiveQueue;
-
-    @Value("${rabbitmq.routing-keys.verify-account}")
-    private String verifyAccountRoutingKey;
-
-    @Value("${rabbitmq.routing-keys.update-last-active}")
-    private String updateLastActiveRoutingKey;
+    public RabbitMQConfig(RabbitMQProperties props) {
+        this.props = props;
+    }
 
     @Bean
     public DirectExchange exchange() {
-        return new DirectExchange(exchange);
+        return new DirectExchange(props.exchange());
     }
 
     @Bean
     public Queue verifyAccountQueue() {
-        return new Queue(verifyAccountQueue, true);
+        return new Queue(props.queues().verifyAccount(), true);
     }
 
     @Bean
     public Queue updateLastActiveQueue() {
-        return new Queue(updateLastActiveQueue, true);
+        return new Queue(props.queues().updateLastActive(), true);
     }
 
     @Bean
     public Binding verifyAccountBinding() {
         return BindingBuilder.bind(verifyAccountQueue())
                 .to(exchange())
-                .with(verifyAccountRoutingKey);
+                .with(props.routingKeys().verifyAccount());
     }
 
     @Bean
     public Binding updateLastActiveBinding() {
         return BindingBuilder.bind(updateLastActiveQueue())
                 .to(exchange())
-                .with(updateLastActiveRoutingKey);
+                .with(props.routingKeys().updateLastActive());
     }
 
     @Bean

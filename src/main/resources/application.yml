@@ -68,8 +68,12 @@ kafka:
 rabbitmq:
   exchange: ${RMQ_EXCHANGE}
   queues:
+    verify-account: ${RMQ_VERIFY_ACCOUNT_Q}
     update-last-active: ${RMQ_UPDATE_LAST_ACTIVE_Q}
   routing-keys:
+    verify-account: ${RMQ_VERIFY_ACCOUNT_RK}
+    create-credentials: ${RMQ_CREATE_CREDENTIALS_RK}
+    profile-setup: ${RMQ_PROFILE_SETUP_RK}
     platform-emails: ${RMQ_PLATFORM_EMAILS_RK}
     reset-passcode: ${RMQ_RESET_PASSCODE_RK}
     update-last-active: ${RMQ_UPDATE_LAST_ACTIVE_RK}
