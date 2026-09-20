@@ -8,6 +8,7 @@ import com.mariuszilinskas.streamix.users.account.producer.RabbitMQProducer;
 import com.mariuszilinskas.streamix.users.account.model.User;
 import com.mariuszilinskas.streamix.users.account.repository.UserRepository;
 import feign.FeignException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -31,22 +32,32 @@ public class UserServiceImpl implements UserService {
     private final IdentityFeignClient identityFeignClient;
     private final UserRepository userRepository;
     private final RabbitMQProducer rabbitMQProducer;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
-    public UserResponse createUser(CreateUserRequest request){
+    public UserResponse createUser(CreateUserRequest request) {
         logger.info("Creating new User with Email: '{}']", request.email());
 
         checkEmailExists(request.email());
         User newUser = createAndSaveUser(request);
-
-        var credentialsRequest = UserMapper.mapToCredentialsRequest(newUser, request.password());
-        rabbitMQProducer.sendCreateCredentialsMessage(credentialsRequest);
+        setupCredentials(newUser, request.password());
 
         var profileRequest = UserMapper.mapToDefaultProfileMessage(newUser);
         rabbitMQProducer.sendCreateDefaultProfileMessage(profileRequest);
 
         return UserMapper.mapToUserResponse(newUser);
+    }
+
+    private void setupCredentials(User user, String rawPassword) {
+        String passwordHash = passwordEncoder.encode(rawPassword);
+        var request = new SetupCredentialsRequest(user.getId(), passwordHash, user.getFirstName(), user.getEmail());
+        try {
+            identityFeignClient.setupCredentials(request);
+        } catch (FeignException ex) {
+            logger.error("Feign Exception when setting up credentials: Status {}, Body {}", ex.status(), ex.contentUTF8());
+            throw new UserRegistrationException(user.getId());
+        }
     }
 
     private User createAndSaveUser(CreateUserRequest request) {

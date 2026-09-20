@@ -54,15 +54,6 @@ public class UserMapper {
         );
     }
 
-    public static CredentialsRequest mapToCredentialsRequest(User user, String password) {
-        return new CredentialsRequest(
-                user.getId(),
-                user.getFirstName(),
-                user.getEmail(),
-                password
-        );
-    }
-
     public static CreateDefaultProfileMessage mapToDefaultProfileMessage(User user) {
         return new CreateDefaultProfileMessage(
                 user.getId(),
