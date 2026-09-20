@@ -12,39 +12,39 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQConfig {
 
-    private final RabbitMQProperties props;
+    private final RabbitMQProperties rabbitMQProperties;
 
-    public RabbitMQConfig(RabbitMQProperties props) {
-        this.props = props;
+    public RabbitMQConfig(RabbitMQProperties rabbitMQProperties) {
+        this.rabbitMQProperties = rabbitMQProperties;
     }
 
     @Bean
     public DirectExchange exchange() {
-        return new DirectExchange(props.exchange());
+        return new DirectExchange(rabbitMQProperties.exchange());
     }
 
     @Bean
     public Queue verifyAccountQueue() {
-        return new Queue(props.queues().verifyAccount(), true);
+        return new Queue(rabbitMQProperties.queues().verifyAccount(), true);
     }
 
     @Bean
     public Queue updateLastActiveQueue() {
-        return new Queue(props.queues().updateLastActive(), true);
+        return new Queue(rabbitMQProperties.queues().updateLastActive(), true);
     }
 
     @Bean
     public Binding verifyAccountBinding() {
         return BindingBuilder.bind(verifyAccountQueue())
                 .to(exchange())
-                .with(props.routingKeys().verifyAccount());
+                .with(rabbitMQProperties.routingKeys().verifyAccount());
     }
 
     @Bean
     public Binding updateLastActiveBinding() {
         return BindingBuilder.bind(updateLastActiveQueue())
                 .to(exchange())
-                .with(props.routingKeys().updateLastActive());
+                .with(rabbitMQProperties.routingKeys().updateLastActive());
     }
 
     @Bean
