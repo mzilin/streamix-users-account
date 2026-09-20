@@ -65,6 +65,7 @@ dependencies {
     implementation 'com.mariuszilinskas.streamix:streamix-web-commons:1.0.1'
 
     // Tooling
+    implementation 'org.springframework.security:spring-security-crypto:6.4.4'
     implementation 'org.jetbrains:annotations:24.0.1'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
