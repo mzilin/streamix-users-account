@@ -9,13 +9,13 @@ spring:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: update
+  kafka:
+    bootstrap-servers: localhost:9092
   rabbitmq:
     host: localhost
     port: 5672
     username: guest
     password: guest
-  kafka:
-    bootstrap-servers: localhost:9092
 
 # Service discovery configuration for CI
 eureka:
@@ -26,16 +26,8 @@ eureka:
 # Messaging configuration for CI
 kafka:
   topics:
-    user-registered:
-      name: dummy-topic
-      partitions: 1
-      replication-factor: 1
-      retention: 1d
-    user-verified:
-      name: dummy-topic
-      partitions: 1
-      replication-factor: 1
-      retention: 1d
+    user-registered: dummy-topic
+    user-verified: dummy-topic
 
 rabbitmq:
   exchange: dummy-exchange
