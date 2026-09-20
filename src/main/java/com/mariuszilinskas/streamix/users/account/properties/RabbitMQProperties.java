@@ -16,7 +16,6 @@ public record RabbitMQProperties(
 
     public record RoutingKeys(
             String verifyAccount,
-            String createCredentials,
             String profileSetup,
             String platformEmails,
             String resetPasscode,
