@@ -32,8 +32,11 @@ kafka:
 rabbitmq:
   exchange: dummy-exchange
   queues:
+    verify-account: dummy-queue
     update-last-active: dummy-queue
   routing-keys:
+    verify-account: dummy-key
+    profile-setup: dummy-key
     platform-emails: dummy-key
     reset-passcode: dummy-key
     update-last-active: dummy-key
