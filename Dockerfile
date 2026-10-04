@@ -4,7 +4,8 @@ FROM eclipse-temurin:21-jdk AS build
 WORKDIR /app
 COPY . .
 RUN chmod +x gradlew
-RUN ./gradlew clean build -x test --no-daemon
+RUN --mount=type=secret,id=gradle_properties,target=/root/.gradle/gradle.properties \
+    ./gradlew clean build -x test --no-daemon
 
 # --- Runtime stage ---
 FROM eclipse-temurin:21-jdk-alpine

@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-import static com.mariuszilinskas.streamix.users.account.constant.RequestValidationMessages.*;
+import static com.mariuszilinskas.streamix.web.constant.ValidationMessages.*;
 
 public record CreateUserRequest(
 

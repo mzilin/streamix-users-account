@@ -4,7 +4,7 @@ import com.mariuszilinskas.streamix.users.account.enums.AddressType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-import static com.mariuszilinskas.streamix.users.account.constant.RequestValidationMessages.*;
+import static com.mariuszilinskas.streamix.web.constant.ValidationMessages.*;
 
 public record UpdateAddressRequest(
 

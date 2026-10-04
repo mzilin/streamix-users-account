@@ -3,7 +3,7 @@ package com.mariuszilinskas.streamix.users.account.exception;
 public class EmailExistsException extends RuntimeException {
 
     public EmailExistsException() {
-        super("This email address is already associated with an account.");
+        super("Unable to complete the request. Please check your details and try again..");
     }
 
 }

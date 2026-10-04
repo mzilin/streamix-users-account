@@ -123,11 +123,18 @@ Ensure you have the following installed on your machine:
 
 ### Running with Docker
 
-1. Build the Docker image:
-    ```bash
-   docker build -t streamix-users-account:latest .
+1. Create ~/.gradle/gradle.properties with your GitHub credentials:
+    ```properties
+    gpr.user=your_github_username
+    gpr.key=your_pat_token
     ```
-2. Run the container:
+2. Build the Docker image:
+    ```bash
+    docker build \
+      --secret id=gradle_properties,src=${HOME}/.gradle/gradle.properties \
+      -t streamix-users-account:latest .
+    ```
+3. Run the container:
     ```bash
    docker run --rm --name streamix_account -p 8110:8110 streamix-users-account:latest
     ```
@@ -135,7 +142,7 @@ Ensure you have the following installed on your machine:
 
 ### Environment Variables
 
-This microservice requires the following environment variable to be configured:
+This microservice requires the following environment variables to be configured:
 
 TBC
 
