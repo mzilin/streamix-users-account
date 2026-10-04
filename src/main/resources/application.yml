@@ -60,6 +60,7 @@ rabbitmq:
     update-last-active: update-last-active
   routing-keys:
     verify-account: verify-account.routing-key
+    create-credentials: create-credentials.routing-key
     profile-setup: profile-setup.routing-key
     platform-emails: platform-emails.routing-key
     reset-passcode: reset-passcode.routing-key

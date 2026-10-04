@@ -1,5 +1,6 @@
 package com.mariuszilinskas.streamix.users.account.producer;
 
+import com.mariuszilinskas.streamix.users.account.dto.CredentialsRequest;
 import com.mariuszilinskas.streamix.users.account.dto.CreateDefaultProfileMessage;
 import com.mariuszilinskas.streamix.users.account.dto.UserLastActiveMessage;
 import com.mariuszilinskas.streamix.users.account.properties.RabbitMQProperties;
@@ -18,6 +19,11 @@ public class RabbitMQProducer {
     private static final Logger logger = LoggerFactory.getLogger(RabbitMQProducer.class);
     private final RabbitTemplate rabbitTemplate;
     private final RabbitMQProperties props;
+
+    public void sendCreateCredentialsMessage(CredentialsRequest request) {
+        logger.info("Sending message to create credentials for User [userId: '{}']", request.userId());
+        rabbitTemplate.convertAndSend(props.exchange(), props.routingKeys().createCredentials(), request);
+    }
 
     public void sendCreateDefaultProfileMessage(CreateDefaultProfileMessage message) {
         logger.info("Sending message to create default user profile: {}", message);

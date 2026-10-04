@@ -2,6 +2,7 @@ package com.mariuszilinskas.streamix.users.account.service;
 
 import com.mariuszilinskas.streamix.users.account.client.IdentityFeignClient;
 import com.mariuszilinskas.streamix.users.account.dto.*;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import com.mariuszilinskas.streamix.users.account.enums.UserRole;
 import com.mariuszilinskas.streamix.users.account.enums.UserStatus;
 import com.mariuszilinskas.streamix.users.account.exception.EmailExistsException;
